@@ -20,6 +20,12 @@ const STEM_TO_ELEMENT: Record<string, string> = {
   癸: "水",
 };
 
+type DaYunLike = {
+  getGanZhi: () => string;
+  getStartAge: () => number;
+  getEndAge: () => number;
+};
+
 const CONSTELLATIONS = [
   ["摩羯座", 1, 20],
   ["水瓶座", 2, 19],
@@ -195,9 +201,9 @@ export function buildReadingProfile(input: ReadingFormInput): ReadingProfile {
     eightChar.getTimeShiShenZhi(),
   ]);
 
-  const decadeLuck: DecadeLuckItem[] = (yun.getDaYun(7) as Array<any>)
-    .filter((item: any) => item.getGanZhi())
-    .map((item: any) => ({
+  const decadeLuck: DecadeLuckItem[] = (yun.getDaYun(7) as DaYunLike[])
+    .filter((item) => item.getGanZhi())
+    .map((item) => ({
       startAge: item.getStartAge(),
       endAge: item.getEndAge(),
       ganzhi: item.getGanZhi(),
