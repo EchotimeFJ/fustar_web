@@ -66,15 +66,7 @@ export interface ReadingPreview {
 }
 
 export interface ReadingModule {
-  key:
-    | "chart"
-    | "overall"
-    | "personality"
-    | "career"
-    | "wealth"
-    | "marriage"
-    | "health"
-    | "advice";
+  key: string;
   title: string;
   summary: string;
   paragraphs: string[];

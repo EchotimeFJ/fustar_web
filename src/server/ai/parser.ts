@@ -8,16 +8,7 @@ const readingResultSchema = z.object({
   }),
   modules: z.array(
     z.object({
-      key: z.enum([
-        "chart",
-        "overall",
-        "personality",
-        "career",
-        "wealth",
-        "marriage",
-        "health",
-        "advice",
-      ]),
+      key: z.string().min(1),
       title: z.string(),
       summary: z.string(),
       paragraphs: z.array(z.string()).min(2),
