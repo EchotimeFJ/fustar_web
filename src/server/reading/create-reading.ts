@@ -7,11 +7,7 @@ import type {
 import { buildReadingProfile } from "@/server/bazi/normalize";
 import { buildExpiryIso } from "@/server/cache/reading-cache";
 import { maybeEnhanceWithOpenRouter } from "@/server/ai/openrouter";
-import {
-  buildChartModule,
-  buildFocusModules,
-  normalizeFocusAreas,
-} from "./focus-modules";
+import { parseAiReadingContent } from "@/server/ai/parser";
 
 function sumGroup(counts: Record<string, number>, keys: readonly string[]) {
   return keys.reduce((total, key) => total + (counts[key] || 0), 0);
@@ -73,33 +69,42 @@ function buildPreview(input: {
   };
 }
 
+function buildFallbackMarkdown(input: ReadingFormInput, preview: ReadingPreview) {
+  const titleName = input.name?.trim() || "缘主";
+  return [
+    "# 命盘总览",
+    `${preview.headline}。${preview.summary}`,
+    "",
+    "# 综合分析",
+    preview.bullets.join("\n"),
+    "",
+    "# 说明",
+    "当前未配置 OpenRouter Key，因此这里展示的是系统本地兜底结果。配置大模型后，会自动改为自由发挥的长文分析，并按一级标题切分展示。",
+    "",
+    `# ${titleName}补充提醒`,
+    "本地兜底版本只用于保证页面可用，不代表最终的自由文本效果。",
+  ].join("\n");
+}
+
 export async function createReading(input: ReadingFormInput): Promise<ReadingResult> {
   const profile = buildReadingProfile(input);
   const sessionId = crypto.randomUUID();
   const createdAt = new Date().toISOString();
-  const focusAreas = normalizeFocusAreas(profile.focusAreas);
-  const chartModule = buildChartModule(profile);
-  const focusModules = buildFocusModules(profile, focusAreas);
+  const preview = buildPreview(profile);
+  const fallbackText = buildFallbackMarkdown(input, preview);
+  const fallbackParsed = parseAiReadingContent(fallbackText);
 
   const draft: ReadingResult = {
     sessionId,
     createdAt,
     expiresAt: buildExpiryIso(),
-    preview: buildPreview(profile),
-    profile: {
-      ...profile,
-      focusAreas,
-    },
-    modules: [chartModule, ...focusModules],
+    preview,
+    profile,
+    sections: fallbackParsed.sections,
+    rawText: fallbackParsed.rawText,
     disclaimer: DISCLAIMER_LINES,
     source: "rule",
   };
 
-  return maybeEnhanceWithOpenRouter(
-    {
-      ...profile,
-      focusAreas,
-    },
-    draft
-  );
+  return maybeEnhanceWithOpenRouter(input, draft);
 }

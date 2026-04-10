@@ -1,12 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  DEFAULT_FOCUS_OPTIONS,
-  FOCUS_OPTIONS,
-  MAX_FOCUS_SELECTIONS,
-} from "@/lib/form-options";
 
 const initialState = {
   name: "",
@@ -15,7 +10,6 @@ const initialState = {
   birthDate: "2001-01-31",
   birthTime: "15:00",
   birthplace: "",
-  customFocusInput: "",
 };
 
 export function BirthInfoForm() {
@@ -23,31 +17,6 @@ export function BirthInfoForm() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selectedFocuses, setSelectedFocuses] = useState<string[]>([
-    ...DEFAULT_FOCUS_OPTIONS,
-  ]);
-
-  const focusCount = useMemo(
-    () =>
-      [
-        ...selectedFocuses,
-        ...form.customFocusInput
-        .split(/[，,]/)
-        .map((item) => item.trim())
-        .filter(Boolean),
-      ].filter(Boolean).length,
-    [form.customFocusInput, selectedFocuses]
-  );
-
-  function toggleFocus(item: string) {
-    setSelectedFocuses((prev) =>
-      prev.includes(item)
-        ? prev.filter((focus) => focus !== item)
-        : prev.length >= MAX_FOCUS_SELECTIONS
-          ? prev
-          : [...prev, item]
-    );
-  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,16 +24,6 @@ export function BirthInfoForm() {
     setError("");
 
     try {
-      const focusAreas = [...selectedFocuses]
-        .concat(
-          form.customFocusInput
-        .split(/[，,]/)
-        .map((item) => item.trim())
-        .filter(Boolean)
-        )
-        .filter((item, index, array) => array.indexOf(item) === index)
-        .slice(0, MAX_FOCUS_SELECTIONS);
-
       const response = await fetch("/api/reading/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,7 +34,6 @@ export function BirthInfoForm() {
           birthDate: form.birthDate,
           birthTime: form.birthTime,
           birthplace: form.birthplace,
-          focusAreas: focusAreas.length ? focusAreas : undefined,
         }),
       });
 
@@ -97,7 +55,7 @@ export function BirthInfoForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5 rounded-[32px] border border-white/10 bg-white/80 p-6 shadow-2xl shadow-slate-900/10 backdrop-blur md:p-8">
       <div className="grid gap-5 md:grid-cols-2">
-        <label className="space-y-2">
+        <label className="space-y-2 md:col-span-1">
           <span className="text-sm font-medium text-slate-700">姓名 / 称呼</span>
           <input
             className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
@@ -107,7 +65,7 @@ export function BirthInfoForm() {
           />
         </label>
 
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-1">
           <span className="text-sm font-medium text-slate-700">性别</span>
           <div className="flex gap-3">
             {[
@@ -130,44 +88,6 @@ export function BirthInfoForm() {
           </div>
         </div>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium text-slate-700">出生日期</span>
-          <input
-            type={form.calendarType === "solar" ? "date" : "text"}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
-            value={form.birthDate}
-            onChange={(event) =>
-              setForm((prev) => ({ ...prev, birthDate: event.target.value }))
-            }
-            placeholder={
-              form.calendarType === "solar"
-                ? undefined
-                : "例如：2001-01-08（农历年月日）"
-            }
-            required
-          />
-          <p className="text-xs text-slate-500">
-            {form.calendarType === "solar"
-              ? "公历直接选择日期。"
-              : "农历请按 YYYY-MM-DD 输入农历年月日，例如 2001-01-08。"}
-          </p>
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-sm font-medium text-slate-700">出生时间</span>
-          <input
-            type="time"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
-            value={form.birthTime}
-            onChange={(event) =>
-              setForm((prev) => ({ ...prev, birthTime: event.target.value }))
-            }
-            required
-          />
-        </label>
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2">
         <div className="space-y-2 md:col-span-2">
           <span className="text-sm font-medium text-slate-700">历法类型</span>
           <div className="flex gap-3">
@@ -192,41 +112,44 @@ export function BirthInfoForm() {
             ))}
           </div>
         </div>
-      </div>
 
-      <label className="block space-y-2">
-        <span className="text-sm font-medium text-slate-700">重点关注问题</span>
-        <div className="flex flex-wrap gap-2">
-          {FOCUS_OPTIONS.map((item) => {
-            const active = selectedFocuses.includes(item);
-            return (
-              <button
-                key={item}
-                type="button"
-                onClick={() => toggleFocus(item)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                  active
-                    ? "bg-violet-600 text-white shadow-sm"
-                    : "bg-violet-50 text-violet-700 hover:bg-violet-100"
-                }`}
-              >
-                {item}
-              </button>
-            );
-          })}
-        </div>
-        <input
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
-          value={form.customFocusInput}
-          onChange={(event) =>
-            setForm((prev) => ({ ...prev, customFocusInput: event.target.value }))
-          }
-          placeholder="也可以自己补充，用逗号分隔，例如：适合城市, 结婚时间"
-        />
-        <p className="text-xs text-slate-500">当前将传入 {focusCount} 个关注主题，最多 {MAX_FOCUS_SELECTIONS} 个；这些选择会影响后端重点展开的类目。</p>
-      </label>
+        <label className="space-y-2 md:col-span-1">
+          <span className="text-sm font-medium text-slate-700">出生日期</span>
+          <input
+            type={form.calendarType === "solar" ? "date" : "text"}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            value={form.birthDate}
+            onChange={(event) =>
+              setForm((prev) => ({ ...prev, birthDate: event.target.value }))
+            }
+            placeholder={
+              form.calendarType === "solar"
+                ? undefined
+                : "例如：2001-01-08（农历年月日）"
+            }
+            required
+          />
+          <p className="text-xs text-slate-500">
+            {form.calendarType === "solar"
+              ? "公历直接选择日期。"
+              : "农历请按 YYYY-MM-DD 输入农历年月日，例如 2001-01-08。"}
+          </p>
+        </label>
 
-      <label className="block space-y-2">
+        <label className="space-y-2 md:col-span-1">
+          <span className="text-sm font-medium text-slate-700">出生时间</span>
+          <input
+            type="time"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            value={form.birthTime}
+            onChange={(event) =>
+              setForm((prev) => ({ ...prev, birthTime: event.target.value }))
+            }
+            required
+          />
+        </label>
+
+        <label className="block space-y-2 md:col-span-2">
         <span className="text-sm font-medium text-slate-700">出生地</span>
         <input
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
@@ -237,10 +160,11 @@ export function BirthInfoForm() {
           placeholder="例如：湖南长沙"
           required
         />
-      </label>
+        </label>
+      </div>
 
       <div className="rounded-2xl bg-slate-50 p-4 text-xs leading-6 text-slate-600">
-        系统只会在短时缓存中保留本次测算结果，页面刷新或过期后需要重新生成。
+        系统只做输入标准化和一级标题切分展示；具体分析内容由大模型自由生成。当前结果只在短时缓存中保留。
       </div>
 
       {error ? <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div> : null}

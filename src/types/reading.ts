@@ -65,6 +65,12 @@ export interface ReadingPreview {
   bullets: string[];
 }
 
+export interface ReadingSection {
+  id: string;
+  title: string;
+  content: string;
+}
+
 export interface ReadingModule {
   key: string;
   title: string;
@@ -77,9 +83,11 @@ export interface ReadingResult {
   sessionId: string;
   createdAt: string;
   expiresAt: string;
-  preview: ReadingPreview;
+  preview?: ReadingPreview;
   profile: ReadingProfile;
-  modules: ReadingModule[];
+  modules?: ReadingModule[];
+  sections: ReadingSection[];
+  rawText: string;
   disclaimer: string[];
-  source: "rule" | "hybrid-ai";
+  source: "rule" | "hybrid-ai" | "llm";
 }

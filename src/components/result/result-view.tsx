@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { ReadingResult } from "@/types/reading";
-import { SummaryCard } from "./summary-card";
-import { PillarCard } from "./pillar-card";
-import { FullModuleCard } from "./full-module-card";
 
 export function ResultView({ sessionId }: { sessionId: string }) {
   const [reading, setReading] = useState<ReadingResult | null>(null);
@@ -51,7 +48,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
     return (
       <div className="rounded-[32px] border border-slate-200 bg-white p-10 text-center shadow-sm">
         <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-violet-500" />
-        <p className="mt-4 text-sm text-slate-600">正在读取命盘与模块化结果...</p>
+        <p className="mt-4 text-sm text-slate-600">正在读取分析结果并按一级标题切分...</p>
       </div>
     );
   }
@@ -83,24 +80,33 @@ export function ResultView({ sessionId }: { sessionId: string }) {
             </p>
           </div>
           <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-500">
-            本次结果来源：{reading.source === "hybrid-ai" ? "规则 + OpenRouter" : "规则引擎"}
+            本次结果来源：{reading.source === "llm" ? "OpenRouter 自由生成" : reading.source === "hybrid-ai" ? "规则 + OpenRouter" : "本地兜底结果"}
             <br />
             结果有效期至：{new Date(reading.expiresAt).toLocaleString("zh-CN")}
           </div>
         </div>
       </section>
 
-      <SummaryCard preview={reading.preview} />
-
-      <section className="grid gap-4 md:grid-cols-4">
-        {reading.profile.pillars.map((pillar) => (
-          <PillarCard key={pillar.label} pillar={pillar} />
-        ))}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-slate-900">输入标准化</h2>
+        <div className="mt-4 grid gap-3 text-sm text-slate-600 md:grid-cols-2">
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">姓名：{reading.profile.name}</div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">性别：{reading.profile.genderLabel}</div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">历法：{reading.profile.calendarType === "solar" ? "公历" : "农历"}</div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">出生地：{reading.profile.birthplace}</div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">公历：{reading.profile.solarText}</div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">农历：{reading.profile.lunarText}</div>
+        </div>
       </section>
 
       <section className="grid gap-6">
-        {reading.modules.map((module) => (
-          <FullModuleCard key={module.key} module={module} />
+        {reading.sections.map((section) => (
+          <section key={section.id} className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-slate-950">{section.title}</h2>
+            <div className="mt-4 space-y-4 text-sm leading-8 text-slate-600 whitespace-pre-wrap">
+              {section.content}
+            </div>
+          </section>
         ))}
       </section>
 

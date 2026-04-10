@@ -1,10 +1,10 @@
 import { getServerEnv, hasOpenRouterConfig } from "@/lib/env";
-import type { ReadingProfile, ReadingResult } from "@/types/reading";
+import type { ReadingFormInput, ReadingResult } from "@/types/reading";
 import { buildAiMessages } from "./prompt";
 import { parseAiReadingContent } from "./parser";
 
 export async function maybeEnhanceWithOpenRouter(
-  profile: ReadingProfile,
+  input: ReadingFormInput,
   draft: ReadingResult
 ) {
   if (!hasOpenRouterConfig()) {
@@ -22,8 +22,15 @@ export async function maybeEnhanceWithOpenRouter(
       },
       body: JSON.stringify({
         model: env.openRouterModel,
-        temperature: 0.7,
-        messages: buildAiMessages(profile, draft),
+        temperature: 0.9,
+        messages: buildAiMessages({
+          name: input.name?.trim() || "缘主",
+          gender: input.gender,
+          calendarType: input.calendarType,
+          birthDate: input.birthDate,
+          birthTime: input.birthTime,
+          birthplace: input.birthplace,
+        }),
       }),
       cache: "no-store",
     });
@@ -38,12 +45,12 @@ export async function maybeEnhanceWithOpenRouter(
       return draft;
     }
 
-    const refined = parseAiReadingContent(content);
+    const parsed = parseAiReadingContent(content);
     return {
       ...draft,
-      preview: refined.preview,
-      modules: refined.modules,
-      source: "hybrid-ai" as const,
+      rawText: parsed.rawText,
+      sections: parsed.sections,
+      source: "llm" as const,
     };
   } catch {
     return draft;

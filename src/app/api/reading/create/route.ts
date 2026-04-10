@@ -11,9 +11,6 @@ const requestSchema = z.object({
   birthDate: z.string(),
   birthTime: z.string(),
   birthplace: z.string(),
-  currentJob: z.string().optional(),
-  sideProjects: z.string().optional(),
-  focusAreas: z.array(z.string()).optional(),
 });
 
 export async function POST(request: Request) {
@@ -25,7 +22,6 @@ export async function POST(request: Request) {
 
     return Response.json({
       sessionId: reading.sessionId,
-      preview: reading.preview,
       profile: {
         name: reading.profile.name,
         solarText: reading.profile.solarText,
