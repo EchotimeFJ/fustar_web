@@ -9,13 +9,13 @@ export default async function ResultPage({
   const { sessionId } = await params;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#f5edff,white_45%)] px-4 py-8 md:px-6 md:py-10">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen px-4 py-8 md:px-6 md:py-10">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <Link href="/" className="text-sm font-medium text-slate-500 transition hover:text-slate-900">
+          <Link href="/" className="text-sm font-medium text-[#c6b18d] transition hover:text-white">
             ← 返回首页
           </Link>
-          <div className="text-xs text-slate-400">session: {sessionId}</div>
+          <div className="text-xs text-[#7f7461]">session: {sessionId}</div>
         </div>
         <ResultView sessionId={sessionId} />
       </div>

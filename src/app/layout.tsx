@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "福星AI算命",
-  description: "基于四柱命理的 Web 模块化测算服务",
+  description: "基于四柱命理的 AI 深度分析服务",
 };
 
 export default function RootLayout({
@@ -28,20 +28,20 @@ export default function RootLayout({
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-slate-50 text-slate-950 flex flex-col">
-        <header className="sticky top-0 z-20 border-b border-white/60 bg-white/80 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-6">
-            <Link href="/" className="text-lg font-semibold tracking-tight text-slate-950">
+      <body className="min-h-full bg-[#08070c] text-[#f5efe2] flex flex-col selection:bg-amber-300/30 selection:text-white">
+        <header className="sticky top-0 z-20 border-b border-white/8 bg-[#0b0911]/75 backdrop-blur-xl">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+            <Link href="/" className="text-lg font-semibold tracking-[0.16em] text-[#f6e7c2] uppercase">
               福星AI算命
             </Link>
-            <nav className="flex items-center gap-4 text-sm text-slate-500">
-              <Link href="/privacy" className="transition hover:text-slate-900">
+            <nav className="flex items-center gap-4 text-sm text-[#c4b89d]">
+              <Link href="/privacy" className="transition hover:text-white">
                 隐私说明
               </Link>
-              <Link href="/terms" className="transition hover:text-slate-900">
+              <Link href="/terms" className="transition hover:text-white">
                 服务条款
               </Link>
-              <Link href="/disclaimer" className="transition hover:text-slate-900">
+              <Link href="/disclaimer" className="transition hover:text-white">
                 免责声明
               </Link>
             </nav>

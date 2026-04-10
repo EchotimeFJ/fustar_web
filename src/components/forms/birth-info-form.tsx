@@ -53,12 +53,19 @@ export function BirthInfoForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-[32px] border border-white/10 bg-white/80 p-6 shadow-2xl shadow-slate-900/10 backdrop-blur md:p-8">
+    <form onSubmit={handleSubmit} className="mystic-panel mystic-border w-full space-y-6 rounded-[36px] p-6 md:p-8">
+      <div>
+        <div className="text-xs font-semibold tracking-[0.28em] text-[#c9b07a] uppercase">
+          Destiny Input
+        </div>
+        <h2 className="mt-3 text-2xl font-semibold text-white md:text-3xl">开始一轮完整测算</h2>
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2">
         <label className="space-y-2 md:col-span-1">
-          <span className="text-sm font-medium text-slate-700">姓名 / 称呼</span>
+          <span className="text-sm font-medium text-[#e8dfcb]">姓名 / 称呼</span>
           <input
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#7f7562] focus:border-amber-300/45 focus:bg-white/8"
             value={form.name}
             onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
             placeholder="可选，用于个性化展示"
@@ -66,7 +73,7 @@ export function BirthInfoForm() {
         </label>
 
         <div className="space-y-2 md:col-span-1">
-          <span className="text-sm font-medium text-slate-700">性别</span>
+          <span className="text-sm font-medium text-[#e8dfcb]">性别</span>
           <div className="flex gap-3">
             {[
               { label: "男", value: "male" },
@@ -78,8 +85,8 @@ export function BirthInfoForm() {
                 onClick={() => setForm((prev) => ({ ...prev, gender: item.value }))}
                 className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   form.gender === item.value
-                    ? "bg-slate-900 text-white"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    ? "bg-gradient-to-r from-[#f3d389] to-[#b67a26] text-[#21170c]"
+                    : "border border-white/10 bg-white/5 text-[#d8ccb2] hover:bg-white/8"
                 }`}
               >
                 {item.label}
@@ -89,7 +96,7 @@ export function BirthInfoForm() {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <span className="text-sm font-medium text-slate-700">历法类型</span>
+          <span className="text-sm font-medium text-[#e8dfcb]">历法类型</span>
           <div className="flex gap-3">
             {[
               { label: "公历", value: "solar" },
@@ -103,8 +110,8 @@ export function BirthInfoForm() {
                 }
                 className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   form.calendarType === item.value
-                    ? "bg-violet-600 text-white"
-                    : "bg-violet-50 text-violet-700 hover:bg-violet-100"
+                    ? "bg-gradient-to-r from-[#f3d389] to-[#b67a26] text-[#21170c]"
+                    : "border border-white/10 bg-white/5 text-[#d8ccb2] hover:bg-white/8"
                 }`}
               >
                 {item.label}
@@ -114,10 +121,10 @@ export function BirthInfoForm() {
         </div>
 
         <label className="space-y-2 md:col-span-1">
-          <span className="text-sm font-medium text-slate-700">出生日期</span>
+          <span className="text-sm font-medium text-[#e8dfcb]">出生日期</span>
           <input
             type={form.calendarType === "solar" ? "date" : "text"}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#7f7562] focus:border-amber-300/45 focus:bg-white/8"
             value={form.birthDate}
             onChange={(event) =>
               setForm((prev) => ({ ...prev, birthDate: event.target.value }))
@@ -132,10 +139,10 @@ export function BirthInfoForm() {
         </label>
 
         <label className="space-y-2 md:col-span-1">
-          <span className="text-sm font-medium text-slate-700">出生时间</span>
+          <span className="text-sm font-medium text-[#e8dfcb]">出生时间</span>
           <input
             type="time"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300/45 focus:bg-white/8"
             value={form.birthTime}
             onChange={(event) =>
               setForm((prev) => ({ ...prev, birthTime: event.target.value }))
@@ -145,9 +152,9 @@ export function BirthInfoForm() {
         </label>
 
         <label className="block space-y-2 md:col-span-2">
-          <span className="text-sm font-medium text-slate-700">出生地</span>
+          <span className="text-sm font-medium text-[#e8dfcb]">出生地</span>
           <input
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#7f7562] focus:border-amber-300/45 focus:bg-white/8"
             value={form.birthplace}
             onChange={(event) =>
               setForm((prev) => ({ ...prev, birthplace: event.target.value }))
@@ -158,12 +165,12 @@ export function BirthInfoForm() {
         </label>
       </div>
 
-      {error ? <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div> : null}
+      {error ? <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div> : null}
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-2xl bg-slate-950 px-5 py-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+        className="w-full rounded-2xl bg-gradient-to-r from-[#f3d389] via-[#d6a85b] to-[#b67a26] px-5 py-4 text-sm font-semibold text-[#24170b] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "正在排盘并生成结果..." : "开始测算"}
       </button>

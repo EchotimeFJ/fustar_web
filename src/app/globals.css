@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #08070c;
+  --foreground: #f5efe2;
 }
 
 @theme inline {
@@ -23,6 +23,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at top, rgba(179, 118, 28, 0.22), transparent 26%),
+    radial-gradient(circle at 20% 20%, rgba(93, 35, 120, 0.28), transparent 28%),
+    linear-gradient(180deg, #09070d 0%, #0d0b12 42%, #09070d 100%);
 }
 
 * {
@@ -32,4 +36,36 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.mystic-panel {
+  background: linear-gradient(180deg, rgba(18, 14, 28, 0.92) 0%, rgba(12, 10, 19, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mystic-gold {
+  background: linear-gradient(135deg, #f5dfab 0%, #c18b2d 45%, #fff1c8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mystic-border {
+  position: relative;
+}
+
+.mystic-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 233, 185, 0.42), rgba(170, 109, 27, 0.16), rgba(255, 255, 255, 0.08));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
