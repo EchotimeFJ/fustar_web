@@ -220,7 +220,7 @@ export function buildReadingProfile(input: ReadingFormInput): ReadingProfile {
     calendarType: parsed.calendarType,
     birthplace: parsed.birthplace,
     solarText: `${solar.getYear()}-${String(solar.getMonth()).padStart(2, "0")}-${String(solar.getDay()).padStart(2, "0")} ${String(solar.getHour()).padStart(2, "0")}:${String(solar.getMinute()).padStart(2, "0")}`,
-    lunarText: `${lunar.getYearInChinese()}年${lunar.getMonthInChinese()}${lunar.getDayInChinese()} ${lunar.getTimeInGanZhi()}时`,
+    lunarText: `${lunar.getYearInChinese()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()} ${lunar.getTimeInGanZhi()}时`,
     zodiac: lunar.getYearShengXiaoExact(),
     constellation: getConstellation(solarMonth, solarDay),
     age: getAge(solarYear, solarMonth, solarDay),

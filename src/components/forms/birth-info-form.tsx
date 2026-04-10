@@ -129,11 +129,6 @@ export function BirthInfoForm() {
             }
             required
           />
-          <p className="text-xs text-slate-500">
-            {form.calendarType === "solar"
-              ? "公历直接选择日期。"
-              : "农历请按 YYYY-MM-DD 输入农历年月日，例如 2001-01-08。"}
-          </p>
         </label>
 
         <label className="space-y-2 md:col-span-1">
@@ -150,21 +145,17 @@ export function BirthInfoForm() {
         </label>
 
         <label className="block space-y-2 md:col-span-2">
-        <span className="text-sm font-medium text-slate-700">出生地</span>
-        <input
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
-          value={form.birthplace}
-          onChange={(event) =>
-            setForm((prev) => ({ ...prev, birthplace: event.target.value }))
-          }
-          placeholder="例如：湖南长沙"
-          required
-        />
+          <span className="text-sm font-medium text-slate-700">出生地</span>
+          <input
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-violet-400"
+            value={form.birthplace}
+            onChange={(event) =>
+              setForm((prev) => ({ ...prev, birthplace: event.target.value }))
+            }
+            placeholder="例如：湖南长沙"
+            required
+          />
         </label>
-      </div>
-
-      <div className="rounded-2xl bg-slate-50 p-4 text-xs leading-6 text-slate-600">
-        系统只做输入标准化和一级标题切分展示；具体分析内容由大模型自由生成。当前结果只在短时缓存中保留。
       </div>
 
       {error ? <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div> : null}
