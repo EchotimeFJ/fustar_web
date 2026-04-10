@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #08070c;
-  --foreground: #f5efe2;
+  --background: #050505;
+  --foreground: #f4f4f4;
 }
 
 @theme inline {
@@ -24,9 +24,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   background-image:
-    radial-gradient(circle at top, rgba(179, 118, 28, 0.22), transparent 26%),
-    radial-gradient(circle at 20% 20%, rgba(93, 35, 120, 0.28), transparent 28%),
-    linear-gradient(180deg, #09070d 0%, #0d0b12 42%, #09070d 100%);
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 24%),
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03), transparent 28%),
+    linear-gradient(180deg, #050505 0%, #0d0d0d 42%, #040404 100%);
 }
 
 * {
@@ -39,13 +39,13 @@ a {
 }
 
 .mystic-panel {
-  background: linear-gradient(180deg, rgba(18, 14, 28, 0.92) 0%, rgba(12, 10, 19, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(16, 16, 16, 0.94) 0%, rgba(10, 10, 10, 0.97) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .mystic-gold {
-  background: linear-gradient(135deg, #f5dfab 0%, #c18b2d 45%, #fff1c8 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #d3d3d3 45%, #f7f7f7 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -61,11 +61,54 @@ a {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 233, 185, 0.42), rgba(170, 109, 27, 0.16), rgba(255, 255, 255, 0.08));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(130, 130, 130, 0.14), rgba(255, 255, 255, 0.06));
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+.taiji-mark {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #f5f5f5 50%, #0a0a0a 50%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.taiji-mark::before,
+.taiji-mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+}
+
+.taiji-mark::before {
+  top: 0;
+  background: #f5f5f5;
+  box-shadow: inset 0 0 0 12px #0a0a0a;
+}
+
+.taiji-mark::after {
+  bottom: 0;
+  background: #0a0a0a;
+  box-shadow: inset 0 0 0 12px #f5f5f5;
+}
+
+.bagua-strip {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.18) 0 20px,
+    transparent 20px 28px,
+    rgba(255,255,255,0.18) 28px 48px,
+    transparent 48px 56px
+  );
 }

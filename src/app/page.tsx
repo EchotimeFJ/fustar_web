@@ -6,13 +6,19 @@ export default function Home() {
     <main>
       <section className="mx-auto grid min-h-[calc(100vh-73px)] max-w-7xl gap-10 px-4 py-8 md:grid-cols-[1.05fr_0.95fr] md:px-6 md:py-14">
         <div className="flex flex-col justify-center">
-          <div className="inline-flex w-fit rounded-full border border-amber-200/15 bg-white/4 px-4 py-2 text-xs font-semibold tracking-[0.28em] text-[#d7c49d] uppercase backdrop-blur">
+          <div className="inline-flex w-fit rounded-full border border-white/10 bg-white/4 px-4 py-2 text-xs font-semibold tracking-[0.28em] text-[#d2d2d2] uppercase backdrop-blur">
             Four Pillars · Blind Reading
           </div>
-          <h1 className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-7xl">
-            福星 <span className="mystic-gold">AI算命</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-[#d2c7b0] md:text-lg">
+          <div className="mt-8 flex items-center gap-5">
+            <div className="taiji-mark hidden md:block" />
+            <div>
+              <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-7xl">
+                福星 <span className="mystic-gold">AI算命</span>
+              </h1>
+              <div className="bagua-strip mt-4 h-2 w-48 rounded-full opacity-70" />
+            </div>
+          </div>
+          <p className="mt-6 max-w-2xl text-base leading-8 text-[#d7d7d7] md:text-lg">
             输入姓名、性别、出生时间与出生地，系统会先标准化基础信息，再交给大模型自由生成完整分析，最后按一级标题为你切分成适合阅读的章节。
           </p>
 
@@ -32,24 +38,24 @@ export default function Home() {
               },
             ].map((item) => (
               <div key={item.title} className="mystic-panel mystic-border rounded-[30px] p-5">
-                <h2 className="text-base font-semibold text-[#f6e8bf]">{item.title}</h2>
-                <p className="mt-3 text-sm leading-7 text-[#c9bea6]">{item.desc}</p>
+                <h2 className="text-base font-semibold text-white">{item.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-[#c8c8c8]">{item.desc}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3 text-sm text-[#b4a98f]">
-            <Link href="/privacy" className="rounded-full border border-white/8 bg-white/4 px-4 py-2 backdrop-blur transition hover:text-white">
+          <div className="mt-10 flex flex-wrap gap-3 text-sm text-[#c7c7c7]">
+            <Link href="/privacy" className="rounded-full border border-white/8 bg-white/4 px-4 py-2 backdrop-blur transition hover:bg-white/8 hover:text-white">
               查看隐私说明
             </Link>
-            <Link href="/disclaimer" className="rounded-full border border-white/8 bg-white/4 px-4 py-2 backdrop-blur transition hover:text-white">
+            <Link href="/disclaimer" className="rounded-full border border-white/8 bg-white/4 px-4 py-2 backdrop-blur transition hover:bg-white/8 hover:text-white">
               查看免责声明
             </Link>
           </div>
         </div>
 
         <div className="relative flex items-center">
-          <div className="pointer-events-none absolute inset-0 -z-10 rounded-[40px] bg-[radial-gradient(circle_at_top,rgba(255,213,133,0.15),transparent_34%),radial-gradient(circle_at_bottom,rgba(125,74,170,0.2),transparent_35%)] blur-2xl" />
+          <div className="pointer-events-none absolute inset-0 -z-10 rounded-[40px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),transparent_34%),radial-gradient(circle_at_bottom,rgba(180,180,180,0.08),transparent_35%)] blur-2xl" />
           <BirthInfoForm />
         </div>
       </section>
