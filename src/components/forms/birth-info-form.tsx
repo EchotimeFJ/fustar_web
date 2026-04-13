@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const initialState = {
@@ -24,13 +24,85 @@ function formatTimeLabel(time: string) {
   return time || "请选择时间";
 }
 
+function padValue(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function parseDateParts(date: string) {
+  const [year = "2000", month = "01", day = "01"] = date.split("-");
+  return {
+    year: Number(year),
+    month: Number(month),
+    day: Number(day),
+  };
+}
+
+function parseTimeParts(time: string) {
+  const [hour = "00", minute = "00"] = time.split(":");
+  return {
+    hour: Number(hour),
+    minute: Number(minute),
+  };
+}
+
+function getDayCount(year: number, month: number, calendarType: "solar" | "lunar") {
+  if (calendarType === "lunar") {
+    return 30;
+  }
+
+  return new Date(year, month, 0).getDate();
+}
+
+const yearOptions = Array.from({ length: 91 }, (_, index) => 1940 + index);
+const monthOptions = Array.from({ length: 12 }, (_, index) => index + 1);
+const hourOptions = Array.from({ length: 24 }, (_, index) => index);
+const minuteOptions = Array.from({ length: 60 }, (_, index) => index);
+const quickTimes = ["00:00", "07:00", "12:00", "19:00", "23:00"];
+const pickerPanelClassName =
+  "mt-4 rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_20px_40px_rgba(0,0,0,0.28)]";
+const pickerFieldClassName =
+  "w-full appearance-none rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30 focus:bg-white/8";
+
 export function BirthInfoForm() {
   const router = useRouter();
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const dateInputRef = useRef<HTMLInputElement>(null);
-  const timeInputRef = useRef<HTMLInputElement>(null);
+  const [activePicker, setActivePicker] = useState<"date" | "time" | null>(null);
+  const dateParts = parseDateParts(form.birthDate);
+  const timeParts = parseTimeParts(form.birthTime);
+  const dayOptions = useMemo(
+    () =>
+      Array.from(
+        { length: getDayCount(dateParts.year, dateParts.month, form.calendarType) },
+        (_, index) => index + 1
+      ),
+    [dateParts.year, dateParts.month, form.calendarType]
+  );
+
+  function updateDatePart(part: "year" | "month" | "day", value: number) {
+    const nextParts = {
+      ...dateParts,
+      [part]: value,
+    };
+    const maxDay = getDayCount(nextParts.year, nextParts.month, form.calendarType);
+    nextParts.day = Math.min(nextParts.day, maxDay);
+    setForm((prev) => ({
+      ...prev,
+      birthDate: `${nextParts.year}-${padValue(nextParts.month)}-${padValue(nextParts.day)}`,
+    }));
+  }
+
+  function updateTimePart(part: "hour" | "minute", value: number) {
+    const nextParts = {
+      ...timeParts,
+      [part]: value,
+    };
+    setForm((prev) => ({
+      ...prev,
+      birthTime: `${padValue(nextParts.hour)}:${padValue(nextParts.minute)}`,
+    }));
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -119,9 +191,10 @@ export function BirthInfoForm() {
               <button
                 key={item.value}
                 type="button"
-                onClick={() =>
-                  setForm((prev) => ({ ...prev, calendarType: item.value }))
-                }
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, calendarType: item.value }));
+                  setActivePicker("date");
+                }}
                 className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   form.calendarType === item.value
                     ? "bg-white text-black"
@@ -150,34 +223,94 @@ export function BirthInfoForm() {
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  if (form.calendarType === "solar") {
-                    dateInputRef.current?.showPicker?.();
-                    dateInputRef.current?.focus();
-                  }
-                }}
+                onClick={() => setActivePicker((prev) => (prev === "date" ? null : "date"))}
                 className="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs text-[#d7d7d7] transition hover:bg-white/10"
               >
-                {form.calendarType === "solar" ? "打开日期盘" : "手动输入"}
+                {activePicker === "date" ? "收起日期盘" : "打开日期盘"}
               </button>
             </div>
-            <div className="mt-4">
-              <input
-                ref={dateInputRef}
-                type={form.calendarType === "solar" ? "date" : "text"}
-                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#7b7b7b] focus:border-white/30 focus:bg-white/8"
-                value={form.birthDate}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, birthDate: event.target.value }))
-                }
-                placeholder={
-                  form.calendarType === "solar"
-                    ? undefined
-                    : "例如：2000-01-01（农历年月日）"
-                }
-                required
-              />
+            <div className="mt-4 text-xs leading-6 text-[#a9a9a9]">
+              {form.calendarType === "solar"
+                ? "使用自定义日期盘选择年月日，视觉和交互与时间选择器保持一致。"
+                : "农历同样使用统一日期盘，当前不提供闰月快捷选择。"}
             </div>
+            {activePicker === "date" ? (
+              <div className={pickerPanelClassName}>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold tracking-[0.24em] text-[#cbc0a7] uppercase">
+                      {form.calendarType === "solar" ? "Date Picker" : "Lunar Picker"}
+                    </div>
+                    <div className="mt-2 text-sm text-[#dad1bf]">
+                      {form.calendarType === "solar" ? "高精度年月日选择" : "统一风格农历年月日输入"}
+                    </div>
+                  </div>
+                  <div className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-[#d7d7d7]">
+                    {formatSolarDate(form.birthDate)}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <label className="space-y-2">
+                    <span className="text-xs font-medium text-[#b7b7b7]">年份</span>
+                    <select
+                      className={pickerFieldClassName}
+                      value={dateParts.year}
+                      onChange={(event) => updateDatePart("year", Number(event.target.value))}
+                    >
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>
+                          {year} 年
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs font-medium text-[#b7b7b7]">月份</span>
+                    <select
+                      className={pickerFieldClassName}
+                      value={dateParts.month}
+                      onChange={(event) => updateDatePart("month", Number(event.target.value))}
+                    >
+                      {monthOptions.map((month) => (
+                        <option key={month} value={month}>
+                          {padValue(month)} 月
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs font-medium text-[#b7b7b7]">日期</span>
+                    <select
+                      className={pickerFieldClassName}
+                      value={dateParts.day}
+                      onChange={(event) => updateDatePart("day", Number(event.target.value))}
+                    >
+                      {dayOptions.map((day) => (
+                        <option key={day} value={day}>
+                          {padValue(day)} 日
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {["2000-01-01", "1995-06-18", "1990-12-31"].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, birthDate: preset }))}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs text-[#d8d8d8] transition hover:bg-white/10"
+                    >
+                      {formatSolarDate(preset)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -195,31 +328,77 @@ export function BirthInfoForm() {
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  timeInputRef.current?.showPicker?.();
-                  timeInputRef.current?.focus();
-                }}
+                onClick={() => setActivePicker((prev) => (prev === "time" ? null : "time"))}
                 className="rounded-full border border-[#f3d389]/20 bg-[#f3d389]/10 px-3 py-1 text-xs text-[#f5ddb1] transition hover:bg-[#f3d389]/16"
               >
-                UTC+08:00
+                {activePicker === "time" ? "收起时刻盘" : "打开时刻盘"}
               </button>
             </div>
             <p className="mt-3 text-xs leading-6 text-[#c9b48b]">
               以北京时间为准，默认使用 24 小时制。
             </p>
-            <div className="mt-4">
-              <input
-                ref={timeInputRef}
-                type="time"
-                step="60"
-                className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition focus:border-white/30 focus:bg-white/8"
-                value={form.birthTime}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, birthTime: event.target.value }))
-                }
-                required
-              />
-            </div>
+            {activePicker === "time" ? (
+              <div className={pickerPanelClassName}>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold tracking-[0.24em] text-[#f1d9ac] uppercase">
+                      Time Picker
+                    </div>
+                    <div className="mt-2 text-sm text-[#e6d0a6]">
+                      北京时间，支持精确到分钟。
+                    </div>
+                  </div>
+                  <div className="rounded-full border border-[#f3d389]/20 bg-[#f3d389]/10 px-3 py-1 text-xs text-[#f5ddb1]">
+                    UTC+08:00
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="space-y-2">
+                    <span className="text-xs font-medium text-[#d7c49a]">小时</span>
+                    <select
+                      className={pickerFieldClassName}
+                      value={timeParts.hour}
+                      onChange={(event) => updateTimePart("hour", Number(event.target.value))}
+                    >
+                      {hourOptions.map((hour) => (
+                        <option key={hour} value={hour}>
+                          {padValue(hour)} 时
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs font-medium text-[#d7c49a]">分钟</span>
+                    <select
+                      className={pickerFieldClassName}
+                      value={timeParts.minute}
+                      onChange={(event) => updateTimePart("minute", Number(event.target.value))}
+                    >
+                      {minuteOptions.map((minute) => (
+                        <option key={minute} value={minute}>
+                          {padValue(minute)} 分
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {quickTimes.map((time) => (
+                    <button
+                      key={time}
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, birthTime: time }))}
+                      className="rounded-full border border-[#f3d389]/16 bg-[#f3d389]/8 px-3 py-2 text-xs text-[#f3ddb6] transition hover:bg-[#f3d389]/14"
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 
