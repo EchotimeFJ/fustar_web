@@ -52,7 +52,7 @@ const readingInputSchema = z.object({
   birthTime: z
     .string()
     .regex(/^\d{2}:\d{2}$/, "时间格式必须是 HH:mm"),
-  birthplace: z.string().trim().min(2).max(80),
+  birthplace: z.string().trim().max(80).default(""),
   currentJob: z.string().trim().max(80).optional(),
   sideProjects: z.string().trim().max(200).optional(),
   focusAreas: z.array(z.string().trim().min(1).max(30)).max(6).optional(),
@@ -218,7 +218,7 @@ export function buildReadingProfile(input: ReadingFormInput): ReadingProfile {
     gender: parsed.gender,
     genderLabel: parsed.gender === "male" ? "男" : "女",
     calendarType: parsed.calendarType,
-    birthplace: parsed.birthplace,
+    birthplace: parsed.birthplace || "未填写",
     solarText: `${solar.getYear()}-${String(solar.getMonth()).padStart(2, "0")}-${String(solar.getDay()).padStart(2, "0")} ${String(solar.getHour()).padStart(2, "0")}:${String(solar.getMinute()).padStart(2, "0")}`,
     lunarText: `${lunar.getYearInChinese()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()} ${lunar.getTimeInGanZhi()}时`,
     zodiac: lunar.getYearShengXiaoExact(),

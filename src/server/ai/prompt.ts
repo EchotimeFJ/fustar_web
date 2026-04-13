@@ -18,8 +18,9 @@ function toCalendarLabel(calendarType: CalendarType) {
 }
 
 export function buildAiMessages(input: PromptInput) {
+  const birthplaceLabel = input.birthplace.trim() || "未填写";
   const userPrompt = [
-    `我的名字是${input.name}，性别是${toGenderLabel(input.gender)}，我的${toCalendarLabel(input.calendarType)}出生日期是${input.birthDate} ${input.birthTime}，出生地是${input.birthplace}。`,
+    `我的名字是${input.name}，性别是${toGenderLabel(input.gender)}，我的${toCalendarLabel(input.calendarType)}出生日期是${input.birthDate} ${input.birthTime}，出生地是${birthplaceLabel}。`,
     "请用盲派技巧逐步分析八字，请分析我的一生运势，各方面的分析都尽可能详细具体。",
   ].join("\n");
 

@@ -4,6 +4,28 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { ReadingResult } from "@/types/reading";
 
+function renderInlineMarkdown(text: string) {
+  const segments = text.split(/(\*\*[^*]+\*\*)/g);
+
+  return segments.map((segment, index) => {
+    if (segment.startsWith("**") && segment.endsWith("**") && segment.length > 4) {
+      return (
+        <strong key={`${segment}-${index}`} className="font-semibold text-white">
+          {segment.slice(2, -2)}
+        </strong>
+      );
+    }
+
+    return <span key={`${segment}-${index}`}>{segment}</span>;
+  });
+}
+
+function renderSectionContent(content: string) {
+  return content.split("\n").map((line, index) => (
+    <p key={`${line}-${index}`}>{renderInlineMarkdown(line)}</p>
+  ));
+}
+
 export function ResultView({ sessionId }: { sessionId: string }) {
   const [reading, setReading] = useState<ReadingResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,7 +102,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
             <div className="text-sm font-medium tracking-[0.24em] text-[#d0d0d0] uppercase">Mystic Reading</div>
             <h1 className="mt-2 text-3xl font-semibold text-white md:text-4xl">{reading.profile.eightChar}</h1>
             <p className="mt-3 text-sm leading-7 text-[#d7d7d7]">
-              {reading.profile.genderLabel}命 · {reading.profile.birthplace} · {reading.profile.solarText} · {reading.profile.lunarText}
+              {reading.profile.genderLabel}命 · {reading.profile.birthplace || "未填写"} · {reading.profile.solarText} · {reading.profile.lunarText}
             </p>
             <div className="mt-5 flex items-center gap-3 text-[#bbbbbb]">
               <div className="taiji-mark h-12 w-12 scale-75 origin-left" />
@@ -116,7 +138,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
               <div className="rounded-2xl border border-white/6 bg-white/4 px-4 py-3">姓名：{reading.profile.name}</div>
               <div className="rounded-2xl border border-white/6 bg-white/4 px-4 py-3">性别：{reading.profile.genderLabel}</div>
               <div className="rounded-2xl border border-white/6 bg-white/4 px-4 py-3">历法：{reading.profile.calendarType === "solar" ? "公历" : "农历"}</div>
-              <div className="rounded-2xl border border-white/6 bg-white/4 px-4 py-3">出生地：{reading.profile.birthplace}</div>
+              <div className="rounded-2xl border border-white/6 bg-white/4 px-4 py-3">出生地：{reading.profile.birthplace || "未填写"}</div>
             </div>
           </div>
         </aside>
@@ -126,7 +148,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
             <section id={section.id} key={section.id} className="mystic-panel mystic-border rounded-[32px] p-6 md:p-8">
               <h2 className="text-2xl font-semibold text-white md:text-3xl">{section.title}</h2>
               <div className="mt-5 space-y-4 whitespace-pre-wrap text-[15px] leading-8 text-[#d7d7d7]">
-                {section.content}
+                {renderSectionContent(section.content)}
               </div>
             </section>
           ))}

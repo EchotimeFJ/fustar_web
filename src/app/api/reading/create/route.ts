@@ -10,7 +10,7 @@ const requestSchema = z.object({
   calendarType: z.enum(["solar", "lunar"]).default("solar"),
   birthDate: z.string(),
   birthTime: z.string(),
-  birthplace: z.string(),
+  birthplace: z.string().optional().default(""),
 });
 
 export async function POST(request: Request) {
