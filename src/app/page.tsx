@@ -20,76 +20,31 @@ export default function Home() {
               <div className="mt-10 flex items-start gap-5">
                 <div className="taiji-mark hidden md:block" />
                 <div>
-                  <div className="text-sm tracking-[0.32em] text-[#9f9586] uppercase">
-                    东方命理 · 低调奢雅
-                  </div>
-                  <h1 className="quiet-lux-display mt-4 text-5xl leading-[0.98] text-white md:text-7xl">
+                  <h1 className="quiet-lux-display text-5xl leading-[0.98] text-white md:text-7xl">
                     福星 <span className="mystic-gold">AI 命理</span>
                   </h1>
                   <div className="bagua-strip mt-5 h-2 w-52 rounded-full opacity-60" />
                 </div>
               </div>
 
-              <p className="mt-8 max-w-2xl text-base leading-8 text-[#d3cdc3] md:text-lg">
-                以克制的视觉语言承载更完整的命理体验。你只需按模板直接输入出生信息，
-                系统会先完成基础信息标准化，再调用模型生成长文分析，最终按一级标题切分为适合阅读的章节。
-              </p>
-
               <div className="mt-10 grid gap-4 md:grid-cols-3">
                 {[
-                  {
-                    kicker: "Direct Input",
-                    title: "模板即格式",
-                    desc: "出生日期与时间统一改为文本输入，减少旧式系统面板带来的割裂感。",
-                  },
-                  {
-                    kicker: "Structured Output",
-                    title: "长文切分",
-                    desc: "保留完整命理叙述，同时用一级标题切分结果，阅读更沉稳清晰。",
-                  },
-                  {
-                    kicker: "Practical Deploy",
-                    title: "本地到上线",
-                    desc: "本地即可验证模型效果，之后可以平滑迁移到服务器与正式域名。",
-                  },
+                  "四柱排盘",
+                  "盲派分析",
+                  "章节结果",
                 ].map((item) => (
                   <div
-                    key={item.title}
-                    className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-5 backdrop-blur"
+                    key={item}
+                    className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] px-5 py-6 backdrop-blur"
                   >
-                    <div className="text-[11px] font-semibold tracking-[0.26em] text-[#c7b188] uppercase">
-                      {item.kicker}
+                    <div className="text-[11px] font-semibold tracking-[0.28em] text-[#c7b188] uppercase">
+                      {item}
                     </div>
-                    <h2 className="mt-4 text-lg font-semibold text-white">{item.title}</h2>
-                    <p className="mt-3 text-sm leading-7 text-[#bdb6aa]">{item.desc}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-10 grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
-                <div className="rounded-[30px] border border-white/8 bg-black/20 p-5">
-                  <div className="text-[11px] font-semibold tracking-[0.26em] text-[#c7b188] uppercase">
-                    Input Note
-                  </div>
-                  <div className="mt-4 space-y-3 text-sm leading-7 text-[#cfc7bc]">
-                    <p>出生日期按 `YYYY-MM-DD` 输入。</p>
-                    <p>出生时间按北京时间 `HH:mm` 输入。</p>
-                    <p>出生地支持留空，未填写时系统会按“未填写”处理。</p>
-                  </div>
-                </div>
-
-                <div className="rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(199,177,136,0.08),rgba(255,255,255,0.02))] p-5">
-                  <div className="text-[11px] font-semibold tracking-[0.26em] text-[#c7b188] uppercase">
-                    Reading Style
-                  </div>
-                  <p className="mt-4 text-sm leading-7 text-[#cfc7bc]">
-                    当前产品方向不是热闹的占卜玩具，而是更像一份经过编排的深色命理报告。
-                    视觉保持压低饱和度，强调秩序、材质感与阅读质感。
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-10 flex flex-wrap gap-3 text-sm text-[#c9c1b6]">
+              <div className="mt-12 flex flex-wrap gap-3 text-sm text-[#c9c1b6]">
                 <Link
                   href="/privacy"
                   className="rounded-full border border-white/8 bg-white/4 px-4 py-2 transition hover:bg-white/8 hover:text-white"
