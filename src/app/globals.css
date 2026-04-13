@@ -22,11 +22,11 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   background-image:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 24%),
+    radial-gradient(circle at top, rgba(201, 182, 143, 0.08), transparent 22%),
     radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03), transparent 28%),
-    linear-gradient(180deg, #050505 0%, #0d0d0d 42%, #040404 100%);
+    linear-gradient(180deg, #050505 0%, #0c0b0a 38%, #040404 100%);
 }
 
 * {
@@ -111,4 +111,10 @@ a {
     rgba(255,255,255,0.18) 28px 48px,
     transparent 48px 56px
   );
+}
+
+.quiet-lux-display {
+  font-family: "Iowan Old Style", "Noto Serif SC", "Songti SC", serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
