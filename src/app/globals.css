@@ -135,3 +135,14 @@ a {
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+
+.wheel-scrollbar {
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wheel-scrollbar::-webkit-scrollbar {
+  display: none;
+}
