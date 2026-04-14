@@ -49,20 +49,6 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="mt-12 flex flex-wrap gap-3 text-sm text-[#c9c1b6]">
-                <Link
-                  href="/privacy"
-                  className="rounded-full border border-white/8 bg-white/4 px-4 py-2 transition hover:bg-white/8 hover:text-white"
-                >
-                  查看隐私说明
-                </Link>
-                <Link
-                  href="/disclaimer"
-                  className="rounded-full border border-white/8 bg-white/4 px-4 py-2 transition hover:bg-white/8 hover:text-white"
-                >
-                  查看免责声明
-                </Link>
-              </div>
             </div>
           </div>
 
@@ -70,6 +56,24 @@ export default function Home() {
             <div className="pointer-events-none absolute inset-0 -z-10 rounded-[42px] bg-[radial-gradient(circle_at_top,rgba(199,177,136,0.12),transparent_38%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.08),transparent_40%)] blur-3xl" />
             <BirthInfoForm />
           </div>
+        </div>
+
+        <div className="mt-8 grid gap-4 xl:grid-cols-[minmax(0,1fr)_160px_160px]">
+          <div className="mystic-panel mystic-border rounded-[30px] px-6 py-5 text-sm leading-7 text-[#d0cabf]">
+            测算内容仅用于当前会话展示，不写入云端长期数据库；关闭当前页面后，系统会自动释放本次临时缓存，尽量减少信息停留时间。
+          </div>
+          <Link
+            href="/privacy"
+            className="flex items-center justify-center rounded-[30px] border border-white/8 bg-white/4 px-5 py-5 text-sm text-[#d3cdc3] transition hover:bg-white/8 hover:text-white"
+          >
+            隐私说明
+          </Link>
+          <Link
+            href="/disclaimer"
+            className="flex items-center justify-center rounded-[30px] border border-white/8 bg-white/4 px-5 py-5 text-sm text-[#d3cdc3] transition hover:bg-white/8 hover:text-white"
+          >
+            免责声明
+          </Link>
         </div>
       </section>
     </main>
