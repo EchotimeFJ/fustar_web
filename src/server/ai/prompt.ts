@@ -18,10 +18,13 @@ function toCalendarLabel(calendarType: CalendarType) {
 }
 
 export function buildAiMessages(input: PromptInput) {
-  const birthplaceLabel = input.birthplace.trim() || "未填写";
+  const birthplaceLabel = input.birthplace.trim();
+  const profileLine = birthplaceLabel
+    ? `我的名字是${input.name}，性别是${toGenderLabel(input.gender)}，我的${toCalendarLabel(input.calendarType)}出生日期是北京时间下的${input.birthDate} ${input.birthTime}，出生地是${birthplaceLabel}。`
+    : `我的名字是${input.name}，性别是${toGenderLabel(input.gender)}，我的${toCalendarLabel(input.calendarType)}出生日期是北京时间下的${input.birthDate} ${input.birthTime}。`;
   const userPrompt = [
-    `我的名字是${input.name}，性别是${toGenderLabel(input.gender)}，我的${toCalendarLabel(input.calendarType)}出生日期是${input.birthDate} ${input.birthTime}，出生地是${birthplaceLabel}。`,
-    "请用盲派技巧逐步分析八字，请分析我的一生运势，各方面的分析都尽可能详细具体。",
+    profileLine,
+    "请用盲派技巧逐步分析八字，详细测算一生综合运势，事业、财运、婚姻、健康等各方面内容，均需具体细致、全面解读，你可以自我扩宽分析面，但是要确保详细准确，除分析具体八字外，使用通俗易懂且令人信服的文字进行描述。",
   ].join("\n");
 
   return [

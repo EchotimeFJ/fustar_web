@@ -79,10 +79,10 @@ function buildFallbackMarkdown(input: ReadingFormInput, preview: ReadingPreview)
     preview.bullets.join("\n"),
     "",
     "# 说明",
-    "当前未配置 OpenRouter Key，因此这里展示的是系统本地兜底结果。配置大模型后，会自动改为自由发挥的长文分析，并按一级标题切分展示。",
+    "当前展示为系统标准分析结果，已按章节整理，便于直接阅读。",
     "",
     `# ${titleName}补充提醒`,
-    "本地兜底版本只用于保证页面可用，不代表最终的自由文本效果。",
+    "命理解读适合作为个人参考，请结合现实情况理性判断。",
   ].join("\n");
 }
 

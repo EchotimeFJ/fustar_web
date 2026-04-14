@@ -14,7 +14,7 @@ export default function Home() {
 
             <div className="relative">
               <div className="inline-flex w-fit rounded-full border border-[#c7b188]/15 bg-[#c7b188]/7 px-4 py-2 text-[11px] font-semibold tracking-[0.34em] text-[#d7c29d] uppercase">
-                Four Pillars · Bespoke Reading
+                Fuxing · Personal Reading
               </div>
 
               <div className="mt-10 flex items-start gap-5">
@@ -24,14 +24,17 @@ export default function Home() {
                     福星 <span className="mystic-gold">AI 命理</span>
                   </h1>
                   <div className="bagua-strip mt-5 h-2 w-52 rounded-full opacity-60" />
+                  <p className="mt-8 max-w-xl text-base leading-8 text-[#d3cdc3] md:text-lg">
+                    专属命盘解读，沉稳呈现一生运势脉络与关键命理信息。
+                  </p>
                 </div>
               </div>
 
               <div className="mt-10 grid gap-4 md:grid-cols-3">
                 {[
-                  "四柱排盘",
-                  "盲派分析",
-                  "章节结果",
+                  "命盘排布",
+                  "综合详批",
+                  "章节呈现",
                 ].map((item) => (
                   <div
                     key={item}

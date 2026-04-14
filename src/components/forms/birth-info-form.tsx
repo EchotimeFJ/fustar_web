@@ -139,7 +139,7 @@ export function BirthInfoForm() {
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, birthDate: event.target.value }))
                 }
-                placeholder="YYYY-MM-DD"
+                placeholder="例：2000.01.01"
                 className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#666] focus:border-[#c7b188]/30 focus:bg-white/8"
                 required
               />
@@ -156,7 +156,7 @@ export function BirthInfoForm() {
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, birthTime: event.target.value }))
                 }
-                placeholder="HH:mm"
+                placeholder="例：00:00"
                 className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#666] focus:border-[#c7b188]/30 focus:bg-white/8"
                 required
               />
@@ -174,7 +174,7 @@ export function BirthInfoForm() {
               onChange={(event) =>
                 setForm((prev) => ({ ...prev, birthplace: event.target.value }))
               }
-              placeholder="湖南长沙"
+              placeholder="例：湖南长沙"
             />
           </label>
         </div>

@@ -74,7 +74,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
     return (
       <div className="mystic-panel mystic-border rounded-[36px] p-12 text-center">
         <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/15 border-t-[#e9cb87]" />
-        <p className="mt-4 text-sm text-[#d2c7b0]">正在读取分析结果并按一级标题切分...</p>
+        <p className="mt-4 text-sm text-[#d2c7b0]">正在生成专属命理解读...</p>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
     return (
       <div className="mystic-panel mystic-border rounded-[36px] p-10 text-center">
         <h2 className="text-xl font-semibold text-white">结果暂时不可用</h2>
-        <p className="mt-3 text-sm leading-7 text-[#d2c7b0]">{error || "请重新提交一次测算。"}</p>
+        <p className="mt-3 text-sm leading-7 text-[#d2c7b0]">{error || "请稍后重新提交测算。"}</p>
         <Link
           href="/"
           className="mt-6 inline-flex rounded-2xl bg-gradient-to-r from-[#f3d389] to-[#b67a26] px-5 py-3 text-sm font-medium text-[#23170b]"
@@ -99,7 +99,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
       <section className="mystic-panel mystic-border rounded-[36px] p-6 md:p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="text-sm font-medium tracking-[0.24em] text-[#d0d0d0] uppercase">Mystic Reading</div>
+            <div className="text-sm font-medium tracking-[0.24em] text-[#d0d0d0] uppercase">Personal Reading</div>
             <h1 className="mt-2 text-3xl font-semibold text-white md:text-4xl">{reading.profile.eightChar}</h1>
             <p className="mt-3 text-sm leading-7 text-[#d7d7d7]">
               {reading.profile.genderLabel}命 · {reading.profile.birthplace || "未填写"} · {reading.profile.solarText} · {reading.profile.lunarText}
@@ -110,9 +110,9 @@ export function ResultView({ sessionId }: { sessionId: string }) {
             </div>
           </div>
           <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-xs leading-6 text-[#bdbdbd]">
-            本次结果来源：{reading.source === "llm" ? "OpenRouter 自由生成" : reading.source === "hybrid-ai" ? "规则 + OpenRouter" : "本地兜底结果"}
+            解读已生成
             <br />
-            结果有效期至：{new Date(reading.expiresAt).toLocaleString("zh-CN")}
+            有效期至：{new Date(reading.expiresAt).toLocaleString("zh-CN")}
           </div>
         </div>
       </section>
@@ -120,7 +120,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
       <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="xl:sticky xl:top-24 xl:self-start">
           <div className="mystic-panel mystic-border rounded-[32px] p-5">
-            <div className="text-xs font-semibold tracking-[0.22em] text-[#d0d0d0] uppercase">Reading Map</div>
+            <div className="text-xs font-semibold tracking-[0.22em] text-[#d0d0d0] uppercase">章节导航</div>
             <div className="mt-5 space-y-2">
               {sectionLinks.map((section, index) => (
                 <a
@@ -156,7 +156,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
       </div>
 
       <section className="mystic-panel mystic-border rounded-[32px] p-6">
-        <h2 className="text-xl font-semibold text-white">说明与边界</h2>
+        <h2 className="text-xl font-semibold text-white">使用说明</h2>
         <div className="mt-4 space-y-3 text-sm leading-7 text-[#bdbdbd]">
           {reading.disclaimer.map((item) => (
             <p key={item}>{item}</p>

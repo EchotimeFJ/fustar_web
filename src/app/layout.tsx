@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "福星AI算命",
-  description: "基于四柱命理的 AI 深度分析服务",
+  title: "福星AI命理",
+  description: "面向用户的四柱命理深度解读服务",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
         <header className="sticky top-0 z-20 border-b border-white/8 bg-[#080808]/75 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
             <Link href="/" className="text-lg font-semibold tracking-[0.16em] text-white uppercase">
-              福星AI算命
+              福星AI命理
             </Link>
             <nav className="flex items-center gap-4 text-sm text-[#c9c9c9]">
               <Link href="/privacy" className="transition hover:text-white">

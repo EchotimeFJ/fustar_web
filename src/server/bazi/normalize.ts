@@ -46,17 +46,64 @@ const readingInputSchema = z.object({
   name: z.string().trim().max(24).optional(),
   gender: z.enum(["male", "female"]),
   calendarType: z.enum(["solar", "lunar"]).default("solar"),
-  birthDate: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "日期格式必须是 YYYY-MM-DD"),
-  birthTime: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, "时间格式必须是 HH:mm"),
+  birthDate: z.string(),
+  birthTime: z.string(),
   birthplace: z.string().trim().max(80).default(""),
   currentJob: z.string().trim().max(80).optional(),
   sideProjects: z.string().trim().max(200).optional(),
   focusAreas: z.array(z.string().trim().min(1).max(30)).max(6).optional(),
-});
+}).transform((input) => ({
+  ...input,
+  birthDate: normalizeBirthDate(input.birthDate, input.calendarType),
+  birthTime: normalizeBirthTime(input.birthTime),
+}));
+
+function normalizeDigits(value: string) {
+  return value.replace(/[０-９]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 65248));
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function pad2(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function getSolarDayCount(year: number, month: number) {
+  return new Date(year, month, 0).getDate();
+}
+
+function normalizeBirthDate(rawValue: string, calendarType: "solar" | "lunar") {
+  const cleaned = normalizeDigits(rawValue)
+    .trim()
+    .replace(/[./]/g, "-")
+    .replace(/[年/月]/g, "-")
+    .replace(/[日号]/g, "")
+    .replace(/\s+/g, "");
+  const parts = cleaned.match(/\d+/g) ?? [];
+
+  const year = clamp(Number(parts[0]) || 2000, 1900, 2099);
+  const month = clamp(Number(parts[1]) || 1, 1, 12);
+  const maxDay = calendarType === "solar" ? getSolarDayCount(year, month) : 30;
+  const day = clamp(Number(parts[2]) || 1, 1, maxDay);
+
+  return `${year}-${pad2(month)}-${pad2(day)}`;
+}
+
+function normalizeBirthTime(rawValue: string) {
+  const cleaned = normalizeDigits(rawValue)
+    .trim()
+    .replace(/[：时点]/g, ":")
+    .replace(/[分]/g, "")
+    .replace(/\s+/g, "");
+  const parts = cleaned.match(/\d+/g) ?? [];
+
+  const hour = clamp(Number(parts[0]) || 0, 0, 23);
+  const minute = clamp(Number(parts[1]) || 0, 0, 59);
+
+  return `${pad2(hour)}:${pad2(minute)}`;
+}
 
 function getConstellation(month: number, day: number) {
   const matched = CONSTELLATIONS.find((item) => {
