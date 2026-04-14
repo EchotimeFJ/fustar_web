@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { BaguaMark } from "@/components/ui/bagua-mark";
+import { TaijiMark } from "@/components/ui/taiji-mark";
 import type { ReadingResult } from "@/types/reading";
 
 function renderInlineMarkdown(text: string) {
@@ -105,8 +107,8 @@ export function ResultView({ sessionId }: { sessionId: string }) {
               {reading.profile.genderLabel}命 · {reading.profile.birthplace || "未填写"} · {reading.profile.solarText} · {reading.profile.lunarText}
             </p>
             <div className="mt-5 flex items-center gap-3 text-[#bbbbbb]">
-              <div className="taiji-mark h-12 w-12 scale-75 origin-left" />
-              <div className="bagua-strip h-2 w-40 rounded-full opacity-60" />
+              <TaijiMark className="h-12 w-12 scale-75 origin-left" />
+              <BaguaMark compact className="opacity-55" />
             </div>
           </div>
           <div className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-xs leading-6 text-[#bdbdbd]">

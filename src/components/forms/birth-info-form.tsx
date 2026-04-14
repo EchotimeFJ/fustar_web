@@ -14,6 +14,8 @@ const initialState = {
 
 const fieldShellClassName =
   "rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_18px_40px_rgba(0,0,0,0.24)]";
+const textInputClassName =
+  "w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#666] focus:border-[#c7b188]/30 focus:bg-white/8";
 
 export function BirthInfoForm() {
   const router = useRouter();
@@ -129,24 +131,29 @@ export function BirthInfoForm() {
             </div>
           </div>
 
-          <label className="space-y-2 md:col-span-1">
+          <label className="space-y-2 md:col-span-2">
             <span className="text-sm font-medium text-[#e5e0d7]">出生日期</span>
             <div className={fieldShellClassName}>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={form.birthDate}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, birthDate: event.target.value }))
-                }
-                placeholder="例：2000.01.01"
-                className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#666] focus:border-[#c7b188]/30 focus:bg-white/8"
-                required
-              />
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-center">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.birthDate}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, birthDate: event.target.value }))
+                  }
+                  placeholder="例：2000.01.01"
+                  className={textInputClassName}
+                  required
+                />
+                <div className="rounded-2xl border border-white/8 bg-white/4 px-4 py-3 text-xs leading-6 text-[#a9a39a]">
+                  仅用于推算八字中的时柱，请按北京时间填写。
+                </div>
+              </div>
             </div>
           </label>
 
-          <label className="space-y-2 md:col-span-1">
+          <label className="space-y-2 md:col-span-2">
             <span className="text-sm font-medium text-[#e5e0d7]">出生时间</span>
             <div className={fieldShellClassName}>
               <input
@@ -157,12 +164,9 @@ export function BirthInfoForm() {
                   setForm((prev) => ({ ...prev, birthTime: event.target.value }))
                 }
                 placeholder="例：00:00"
-                className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#666] focus:border-[#c7b188]/30 focus:bg-white/8"
+                className={textInputClassName}
                 required
               />
-              <p className="mt-3 text-xs leading-6 text-[#a9a39a]">
-                仅用于推算八字中的时柱，请按北京时间填写。
-              </p>
             </div>
           </label>
 

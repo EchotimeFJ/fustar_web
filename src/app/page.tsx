@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { BirthInfoForm } from "@/components/forms/birth-info-form";
+import { BaguaMark } from "@/components/ui/bagua-mark";
+import { TaijiMark } from "@/components/ui/taiji-mark";
 
 export default function Home() {
   return (
@@ -18,12 +20,12 @@ export default function Home() {
               </div>
 
               <div className="mt-10 flex items-start gap-5">
-                <div className="taiji-mark hidden md:block" />
+                <TaijiMark className="hidden md:block" />
                 <div>
                   <h1 className="quiet-lux-display text-5xl leading-[0.98] text-white md:text-7xl">
                     福星 <span className="mystic-gold">AI 命理</span>
                   </h1>
-                  <div className="bagua-strip mt-5 h-2 w-52 rounded-full opacity-60" />
+                  <BaguaMark className="mt-5 opacity-65" />
                   <p className="mt-8 max-w-xl text-base leading-8 text-[#d3cdc3] md:text-lg">
                     专属命盘解读，沉稳呈现一生运势脉络与关键命理信息。
                   </p>
