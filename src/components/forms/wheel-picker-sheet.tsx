@@ -24,7 +24,7 @@ type WheelPickerSheetProps = {
   confirmLabel?: string;
 };
 
-const ROW_HEIGHT = 52;
+const ROW_HEIGHT = 60;
 const EDGE_SPACER_HEIGHT = ROW_HEIGHT * 2;
 
 function WheelColumn({ label, options, value, onChange }: WheelColumnConfig) {
@@ -90,13 +90,17 @@ function WheelColumn({ label, options, value, onChange }: WheelColumnConfig) {
         {label}
       </div>
       <div className="relative overflow-hidden rounded-[26px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
-        <div className="pointer-events-none absolute inset-x-3 top-1/2 z-10 h-[52px] -translate-y-1/2 rounded-2xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))] shadow-[0_18px_40px_rgba(0,0,0,0.2)]" />
+        <div
+          style={{ height: ROW_HEIGHT }}
+          className="pointer-events-none absolute inset-x-3 top-1/2 z-10 -translate-y-1/2 rounded-2xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))] shadow-[0_18px_40px_rgba(0,0,0,0.2)]"
+        />
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-[linear-gradient(180deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 bg-[linear-gradient(0deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
         <div
           ref={viewportRef}
           onScroll={handleScroll}
-          className="wheel-scrollbar h-[260px] overflow-y-auto overscroll-contain px-3 py-0"
+          style={{ height: ROW_HEIGHT * 5 }}
+          className="wheel-scrollbar overflow-y-auto overscroll-contain px-3 py-0"
         >
           <div style={{ height: EDGE_SPACER_HEIGHT }} />
           {options.map((option) => {
@@ -107,11 +111,14 @@ function WheelColumn({ label, options, value, onChange }: WheelColumnConfig) {
                 key={`${label}-${option.value}`}
                 type="button"
                 onClick={() => onChange(option.value)}
-                className={`flex h-[52px] w-full snap-center items-center justify-center rounded-2xl px-4 text-center text-base transition ${
+                style={{ height: ROW_HEIGHT }}
+                className={`flex w-full snap-center items-center justify-center rounded-2xl px-4 text-center transition ${
                   active ? "text-white" : "text-[#7d7569]"
                 }`}
               >
-                <span className={active ? "font-semibold" : "font-medium"}>
+                <span
+                  className={`px-2 text-sm leading-5 whitespace-normal md:text-[15px] ${active ? "font-semibold" : "font-medium"}`}
+                >
                   {option.label}
                 </span>
               </button>

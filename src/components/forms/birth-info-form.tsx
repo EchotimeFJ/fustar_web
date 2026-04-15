@@ -405,11 +405,11 @@ export function BirthInfoForm() {
                 <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase">
                   Wheel Region
                 </div>
-                <div className="mt-3 text-[26px] font-semibold text-white">
+                <div className="mt-3 text-[22px] leading-tight font-semibold text-white md:text-[24px]">
                   {form.birthplace || "暂不填写"}
                 </div>
                 <div className="mt-3 text-xs leading-6 text-[#a9a39a]">
-                  省市联动滚轮选择，支持留空。
+                  覆盖全国省级与地级行政区名称，支持留空。
                 </div>
               </button>
             </div>
@@ -499,7 +499,7 @@ export function BirthInfoForm() {
       <WheelPickerSheet
         open={activePicker === "place"}
         title="选择出生地区"
-        subtitle="支持省市联动滚轮选择；如果你不想填写，也可以直接保留“暂不填写”。"
+        subtitle="覆盖全国省级、地级市、自治州、地区、直辖市区县，以及港澳与台湾县市；如果你不想填写，也可以直接保留“暂不填写”。"
         columns={[
           {
             label: "省份",
@@ -515,7 +515,7 @@ export function BirthInfoForm() {
               }),
           },
           {
-            label: "城市",
+            label: "城市 / 地区",
             options: cityOptions,
             value: placeDraft.city,
             onChange: (value) => setPlaceDraft((prev) => ({ ...prev, city: value })),
