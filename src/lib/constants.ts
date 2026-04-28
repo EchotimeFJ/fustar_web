@@ -2,7 +2,7 @@ import type { ReadingModule } from "@/types/reading";
 
 export const APP_NAME = "福星AI算命";
 
-export const READING_TTL_MS = 1000 * 60 * 60 * 6;
+export const READING_TTL_MS = 1000 * 60 * 15;
 
 export const MODULE_META: Array<Pick<ReadingModule, "key" | "title">> = [
   { key: "chart", title: "命盘总览" },

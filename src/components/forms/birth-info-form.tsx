@@ -46,7 +46,6 @@ const genderOptions = [
 ] as const;
 const calendarOptions = [
   { label: "公历", value: "solar" },
-  { label: "农历", value: "lunar" },
 ] as const;
 
 function pad(value: number | string) {
