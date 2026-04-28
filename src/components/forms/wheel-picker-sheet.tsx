@@ -30,6 +30,9 @@ const EDGE_SPACER_HEIGHT = ROW_HEIGHT * 2;
 function WheelColumn({ label, options, value, onChange }: WheelColumnConfig) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const settleTimerRef = useRef<number | null>(null);
+  const isDraggingRef = useRef<boolean>(false);
+  const startYRef = useRef<number>(0);
+  const startScrollTopRef = useRef<number>(0);
   const selectedIndex = Math.max(
     0,
     options.findIndex((option) => option.value === value)
@@ -84,6 +87,35 @@ function WheelColumn({ label, options, value, onChange }: WheelColumnConfig) {
     }, 80);
   }
 
+  function handleMouseDown(e: React.MouseEvent) {
+    isDraggingRef.current = true;
+    startYRef.current = e.clientY;
+    const viewport = viewportRef.current;
+    if (viewport) {
+      startScrollTopRef.current = viewport.scrollTop;
+    }
+  }
+
+  function handleMouseMove(e: React.MouseEvent) {
+    if (!isDraggingRef.current) return;
+    
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const deltaY = e.clientY - startYRef.current;
+    viewport.scrollTop = startScrollTopRef.current - deltaY;
+  }
+
+  function handleMouseUp() {
+    isDraggingRef.current = false;
+    handleScroll();
+  }
+
+  function handleMouseLeave() {
+    isDraggingRef.current = false;
+    handleScroll();
+  }
+
   return (
     <div className="min-w-0 flex-1">
       <div className="mb-3 text-center text-[11px] font-semibold tracking-[0.3em] text-[#b79d72] uppercase">
@@ -99,8 +131,12 @@ function WheelColumn({ label, options, value, onChange }: WheelColumnConfig) {
         <div
           ref={viewportRef}
           onScroll={handleScroll}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
           style={{ height: ROW_HEIGHT * 5 }}
-          className="wheel-scrollbar overflow-y-auto overscroll-contain px-3 py-0"
+          className="wheel-scrollbar overflow-y-auto overscroll-contain px-3 py-0 cursor-grab active:cursor-grabbing"
         >
           <div style={{ height: EDGE_SPACER_HEIGHT }} />
           {options.map((option) => {

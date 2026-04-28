@@ -39,7 +39,7 @@ const initialState: FormState = {
 };
 
 const selectionTriggerClassName =
-  "group w-full rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_18px_40px_rgba(0,0,0,0.24)] transition hover:border-[#d7c29d]/18 hover:bg-white/[0.07]";
+  "group w-full rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_18px_40px_rgba(0,0,0,0.24)] transition hover:border-[#d7c29d]/18 hover:bg-white/[0.07] card-hover";
 const genderOptions = [
   { label: "男", value: "male" },
   { label: "女", value: "female" },
@@ -136,13 +136,36 @@ function clampDateDraft(date: DraftDate, calendarType: CalendarType): DraftDate 
 
 export function BirthInfoForm() {
   const router = useRouter();
-  const [form, setForm] = useState(initialState);
+
+  // 从本地存储加载表单数据
+  const loadFormFromStorage = (): FormState => {
+    try {
+      const savedForm = localStorage.getItem('fustar_form');
+      if (savedForm) {
+        return JSON.parse(savedForm);
+      }
+    } catch (error) {
+      console.error('Failed to load form from storage:', error);
+    }
+    return initialState;
+  };
+
+  const [form, setForm] = useState<FormState>(loadFormFromStorage);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activePicker, setActivePicker] = useState<PickerType>(null);
-  const [dateDraft, setDateDraft] = useState<DraftDate>(() => parseBirthDate(initialState.birthDate));
-  const [timeDraft, setTimeDraft] = useState<DraftTime>(() => parseBirthTime(initialState.birthTime));
-  const [placeDraft, setPlaceDraft] = useState<DraftPlace>(() => inferPlaceDraft(initialState.birthplace));
+  const [dateDraft, setDateDraft] = useState<DraftDate>(() => parseBirthDate(form.birthDate));
+  const [timeDraft, setTimeDraft] = useState<DraftTime>(() => parseBirthTime(form.birthTime));
+  const [placeDraft, setPlaceDraft] = useState<DraftPlace>(() => inferPlaceDraft(form.birthplace));
+
+  // 监听表单变化，保存到本地存储
+  useEffect(() => {
+    try {
+      localStorage.setItem('fustar_form', JSON.stringify(form));
+    } catch (error) {
+      console.error('Failed to save form to storage:', error);
+    }
+  }, [form]);
 
   const yearOptions = useMemo<WheelOption[]>(
     () =>
@@ -232,16 +255,6 @@ export function BirthInfoForm() {
       }));
     }
   }, [cityOptions, placeDraft.city]);
-
-  function openDatePicker() {
-    setDateDraft(clampDateDraft(parseBirthDate(form.birthDate), form.calendarType));
-    setActivePicker("date");
-  }
-
-  function openTimePicker() {
-    setTimeDraft(parseBirthTime(form.birthTime));
-    setActivePicker("time");
-  }
 
   function openPlacePicker() {
     setPlaceDraft(inferPlaceDraft(form.birthplace));
@@ -355,44 +368,421 @@ export function BirthInfoForm() {
               </div>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-4 md:col-span-2">
               <span className="text-sm font-medium text-[#e5e0d7]">出生年月日</span>
-              <button
-                type="button"
-                onClick={openDatePicker}
-                className={selectionTriggerClassName}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase">
-                      Wheel Date
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">年份</div>
+                  <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
+                    <div
+                      style={{ height: 40 }}
+                      className="pointer-events-none absolute inset-x-2 top-1/2 z-10 -translate-y-1/2 rounded-xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-[linear-gradient(180deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-[linear-gradient(0deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div
+                      style={{ height: 200 }}
+                      className="wheel-scrollbar overflow-y-auto overscroll-contain px-2 py-0 cursor-grab active:cursor-grabbing"
+                      onScroll={(e) => {
+                        const target = e.target as HTMLDivElement;
+                        const selectedIndex = Math.max(0, Math.min(yearOptions.length - 1, Math.round(target.scrollTop / 40)));
+                        const selectedOption = yearOptions[selectedIndex];
+                        if (selectedOption && selectedOption.value !== dateDraft.year) {
+                          setDateDraft(prev => clampDateDraft({ ...prev, year: selectedOption.value }, form.calendarType));
+                          setForm(prev => ({
+                            ...prev,
+                            birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), year: selectedOption.value }, form.calendarType))
+                          }));
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        const target = e.currentTarget as HTMLDivElement;
+                        const startY = e.clientY;
+                        const startScrollTop = target.scrollTop;
+                        
+                        const handleMouseMove = (moveEvent: MouseEvent) => {
+                          const deltaY = moveEvent.clientY - startY;
+                          target.scrollTop = startScrollTop - deltaY;
+                        };
+                        
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                          // 滚动结束后更新值
+                          const selectedIndex = Math.max(0, Math.min(yearOptions.length - 1, Math.round(target.scrollTop / 40)));
+                          const selectedOption = yearOptions[selectedIndex];
+                          if (selectedOption && selectedOption.value !== dateDraft.year) {
+                            setDateDraft(prev => clampDateDraft({ ...prev, year: selectedOption.value }, form.calendarType));
+                            setForm(prev => ({
+                              ...prev,
+                              birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), year: selectedOption.value }, form.calendarType))
+                            }));
+                          }
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    >
+                      <div style={{ height: 80 }} />
+                      {yearOptions.map((option) => {
+                        const active = option.value === dateDraft.year;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              const newDate = clampDateDraft({ ...dateDraft, year: option.value }, form.calendarType);
+                              setDateDraft(newDate);
+                              setForm(prev => ({
+                                ...prev,
+                                birthDate: formatBirthDate(newDate)
+                              }));
+                            }}
+                            style={{ height: 40 }}
+                            className={`flex w-full snap-center items-center justify-center rounded-xl px-2 text-center transition ${active ? "text-white" : "text-[#7d7569]"}`}
+                          >
+                            <span className={`text-sm ${active ? "font-semibold" : "font-medium"}`}>
+                              {option.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <div style={{ height: 80 }} />
                     </div>
-                    <div className="mt-3 text-[26px] font-semibold text-white">
-                      {formatBirthDateDisplay(form.birthDate)}
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/8 bg-white/4 px-4 py-3 text-xs leading-6 text-[#a9a39a]">
-                    {form.calendarType === "solar" ? "公历滚轮选择" : "农历滚轮选择"}
                   </div>
                 </div>
-              </button>
+                <div className="space-y-2">
+                  <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">月份</div>
+                  <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
+                    <div
+                      style={{ height: 40 }}
+                      className="pointer-events-none absolute inset-x-2 top-1/2 z-10 -translate-y-1/2 rounded-xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-[linear-gradient(180deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-[linear-gradient(0deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div
+                      style={{ height: 200 }}
+                      className="wheel-scrollbar overflow-y-auto overscroll-contain px-2 py-0 cursor-grab active:cursor-grabbing"
+                      onScroll={(e) => {
+                        const target = e.target as HTMLDivElement;
+                        const selectedIndex = Math.max(0, Math.min(monthOptions.length - 1, Math.round(target.scrollTop / 40)));
+                        const selectedOption = monthOptions[selectedIndex];
+                        if (selectedOption && selectedOption.value !== dateDraft.month) {
+                          setDateDraft(prev => clampDateDraft({ ...prev, month: selectedOption.value }, form.calendarType));
+                          setForm(prev => ({
+                            ...prev,
+                            birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), month: selectedOption.value }, form.calendarType))
+                          }));
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        const target = e.currentTarget as HTMLDivElement;
+                        const startY = e.clientY;
+                        const startScrollTop = target.scrollTop;
+                        
+                        const handleMouseMove = (moveEvent: MouseEvent) => {
+                          const deltaY = moveEvent.clientY - startY;
+                          target.scrollTop = startScrollTop - deltaY;
+                        };
+                        
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                          // 滚动结束后更新值
+                          const selectedIndex = Math.max(0, Math.min(monthOptions.length - 1, Math.round(target.scrollTop / 40)));
+                          const selectedOption = monthOptions[selectedIndex];
+                          if (selectedOption && selectedOption.value !== dateDraft.month) {
+                            setDateDraft(prev => clampDateDraft({ ...prev, month: selectedOption.value }, form.calendarType));
+                            setForm(prev => ({
+                              ...prev,
+                              birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), month: selectedOption.value }, form.calendarType))
+                            }));
+                          }
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    >
+                      <div style={{ height: 80 }} />
+                      {monthOptions.map((option) => {
+                        const active = option.value === dateDraft.month;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              const newDate = clampDateDraft({ ...dateDraft, month: option.value }, form.calendarType);
+                              setDateDraft(newDate);
+                              setForm(prev => ({
+                                ...prev,
+                                birthDate: formatBirthDate(newDate)
+                              }));
+                            }}
+                            style={{ height: 40 }}
+                            className={`flex w-full snap-center items-center justify-center rounded-xl px-2 text-center transition ${active ? "text-white" : "text-[#7d7569]"}`}
+                          >
+                            <span className={`text-sm ${active ? "font-semibold" : "font-medium"}`}>
+                              {option.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <div style={{ height: 80 }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">日期</div>
+                  <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
+                    <div
+                      style={{ height: 40 }}
+                      className="pointer-events-none absolute inset-x-2 top-1/2 z-10 -translate-y-1/2 rounded-xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-[linear-gradient(180deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-[linear-gradient(0deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div
+                      style={{ height: 200 }}
+                      className="wheel-scrollbar overflow-y-auto overscroll-contain px-2 py-0 cursor-grab active:cursor-grabbing"
+                      onScroll={(e) => {
+                        const target = e.target as HTMLDivElement;
+                        const selectedIndex = Math.max(0, Math.min(dayOptions.length - 1, Math.round(target.scrollTop / 40)));
+                        const selectedOption = dayOptions[selectedIndex];
+                        if (selectedOption && selectedOption.value !== dateDraft.day) {
+                          setDateDraft(prev => ({ ...prev, day: selectedOption.value }));
+                          setForm(prev => ({
+                            ...prev,
+                            birthDate: formatBirthDate({ ...parseBirthDate(prev.birthDate), day: selectedOption.value })
+                          }));
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        const target = e.currentTarget as HTMLDivElement;
+                        const startY = e.clientY;
+                        const startScrollTop = target.scrollTop;
+                        
+                        const handleMouseMove = (moveEvent: MouseEvent) => {
+                          const deltaY = moveEvent.clientY - startY;
+                          target.scrollTop = startScrollTop - deltaY;
+                        };
+                        
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                          // 滚动结束后更新值
+                          const selectedIndex = Math.max(0, Math.min(dayOptions.length - 1, Math.round(target.scrollTop / 40)));
+                          const selectedOption = dayOptions[selectedIndex];
+                          if (selectedOption && selectedOption.value !== dateDraft.day) {
+                            setDateDraft(prev => ({ ...prev, day: selectedOption.value }));
+                            setForm(prev => ({
+                              ...prev,
+                              birthDate: formatBirthDate({ ...parseBirthDate(prev.birthDate), day: selectedOption.value })
+                            }));
+                          }
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    >
+                      <div style={{ height: 80 }} />
+                      {dayOptions.map((option) => {
+                        const active = option.value === dateDraft.day;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              setDateDraft(prev => ({ ...prev, day: option.value }));
+                              setForm(prev => ({
+                                ...prev,
+                                birthDate: formatBirthDate({ ...parseBirthDate(prev.birthDate), day: option.value })
+                              }));
+                            }}
+                            style={{ height: 40 }}
+                            className={`flex w-full snap-center items-center justify-center rounded-xl px-2 text-center transition ${active ? "text-white" : "text-[#7d7569]"}`}
+                          >
+                            <span className={`text-sm ${active ? "font-semibold" : "font-medium"}`}>
+                              {option.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <div style={{ height: 80 }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2 md:col-span-1">
+            <div className="space-y-4 md:col-span-1">
               <span className="text-sm font-medium text-[#e5e0d7]">出生时间</span>
-              <button
-                type="button"
-                onClick={openTimePicker}
-                className={selectionTriggerClassName}
-              >
-                <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase">
-                  Wheel Time
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">小时</div>
+                  <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
+                    <div
+                      style={{ height: 40 }}
+                      className="pointer-events-none absolute inset-x-2 top-1/2 z-10 -translate-y-1/2 rounded-xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-[linear-gradient(180deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-[linear-gradient(0deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div
+                      style={{ height: 200 }}
+                      className="wheel-scrollbar overflow-y-auto overscroll-contain px-2 py-0 cursor-grab active:cursor-grabbing"
+                      onScroll={(e) => {
+                        const target = e.target as HTMLDivElement;
+                        const selectedIndex = Math.max(0, Math.min(hourOptions.length - 1, Math.round(target.scrollTop / 40)));
+                        const selectedOption = hourOptions[selectedIndex];
+                        if (selectedOption && selectedOption.value !== timeDraft.hour) {
+                          setTimeDraft(prev => ({ ...prev, hour: selectedOption.value }));
+                          setForm(prev => ({
+                            ...prev,
+                            birthTime: formatBirthTime({ ...parseBirthTime(prev.birthTime), hour: selectedOption.value })
+                          }));
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        const target = e.currentTarget as HTMLDivElement;
+                        const startY = e.clientY;
+                        const startScrollTop = target.scrollTop;
+                        
+                        const handleMouseMove = (moveEvent: MouseEvent) => {
+                          const deltaY = moveEvent.clientY - startY;
+                          target.scrollTop = startScrollTop - deltaY;
+                        };
+                        
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                          // 滚动结束后更新值
+                          const selectedIndex = Math.max(0, Math.min(hourOptions.length - 1, Math.round(target.scrollTop / 40)));
+                          const selectedOption = hourOptions[selectedIndex];
+                          if (selectedOption && selectedOption.value !== timeDraft.hour) {
+                            setTimeDraft(prev => ({ ...prev, hour: selectedOption.value }));
+                            setForm(prev => ({
+                              ...prev,
+                              birthTime: formatBirthTime({ ...parseBirthTime(prev.birthTime), hour: selectedOption.value })
+                            }));
+                          }
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    >
+                      <div style={{ height: 80 }} />
+                      {hourOptions.map((option) => {
+                        const active = option.value === timeDraft.hour;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              setTimeDraft(prev => ({ ...prev, hour: option.value }));
+                              setForm(prev => ({
+                                ...prev,
+                                birthTime: formatBirthTime({ ...parseBirthTime(prev.birthTime), hour: option.value })
+                              }));
+                            }}
+                            style={{ height: 40 }}
+                            className={`flex w-full snap-center items-center justify-center rounded-xl px-2 text-center transition ${active ? "text-white" : "text-[#7d7569]"}`}
+                          >
+                            <span className={`text-sm ${active ? "font-semibold" : "font-medium"}`}>
+                              {option.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <div style={{ height: 80 }} />
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-3 text-[26px] font-semibold text-white">{form.birthTime}</div>
-                <div className="mt-3 text-xs leading-6 text-[#a9a39a]">
-                  北京时间，用于推算八字中的时柱。
+                <div className="space-y-2">
+                  <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">分钟</div>
+                  <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
+                    <div
+                      style={{ height: 40 }}
+                      className="pointer-events-none absolute inset-x-2 top-1/2 z-10 -translate-y-1/2 rounded-xl border border-[#d7c29d]/18 bg-[linear-gradient(135deg,rgba(241,237,229,0.14),rgba(216,202,178,0.06))]"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-[linear-gradient(180deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-[linear-gradient(0deg,rgba(8,8,8,0.88),rgba(8,8,8,0.08))]" />
+                    <div
+                      style={{ height: 200 }}
+                      className="wheel-scrollbar overflow-y-auto overscroll-contain px-2 py-0 cursor-grab active:cursor-grabbing"
+                      onScroll={(e) => {
+                        const target = e.target as HTMLDivElement;
+                        const selectedIndex = Math.max(0, Math.min(minuteOptions.length - 1, Math.round(target.scrollTop / 40)));
+                        const selectedOption = minuteOptions[selectedIndex];
+                        if (selectedOption && selectedOption.value !== timeDraft.minute) {
+                          setTimeDraft(prev => ({ ...prev, minute: selectedOption.value }));
+                          setForm(prev => ({
+                            ...prev,
+                            birthTime: formatBirthTime({ ...parseBirthTime(prev.birthTime), minute: selectedOption.value })
+                          }));
+                        }
+                      }}
+                      onMouseDown={(e) => {
+                        const target = e.currentTarget as HTMLDivElement;
+                        const startY = e.clientY;
+                        const startScrollTop = target.scrollTop;
+                        
+                        const handleMouseMove = (moveEvent: MouseEvent) => {
+                          const deltaY = moveEvent.clientY - startY;
+                          target.scrollTop = startScrollTop - deltaY;
+                        };
+                        
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                          // 滚动结束后更新值
+                          const selectedIndex = Math.max(0, Math.min(minuteOptions.length - 1, Math.round(target.scrollTop / 40)));
+                          const selectedOption = minuteOptions[selectedIndex];
+                          if (selectedOption && selectedOption.value !== timeDraft.minute) {
+                            setTimeDraft(prev => ({ ...prev, minute: selectedOption.value }));
+                            setForm(prev => ({
+                              ...prev,
+                              birthTime: formatBirthTime({ ...parseBirthTime(prev.birthTime), minute: selectedOption.value })
+                            }));
+                          }
+                        };
+                        
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('mouseup', handleMouseUp);
+                      }}
+                    >
+                      <div style={{ height: 80 }} />
+                      {minuteOptions.map((option) => {
+                        const active = option.value === timeDraft.minute;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              setTimeDraft(prev => ({ ...prev, minute: option.value }));
+                              setForm(prev => ({
+                                ...prev,
+                                birthTime: formatBirthTime({ ...parseBirthTime(prev.birthTime), minute: option.value })
+                              }));
+                            }}
+                            style={{ height: 40 }}
+                            className={`flex w-full snap-center items-center justify-center rounded-xl px-2 text-center transition ${active ? "text-white" : "text-[#7d7569]"}`}
+                          >
+                            <span className={`text-sm ${active ? "font-semibold" : "font-medium"}`}>
+                              {option.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <div style={{ height: 80 }} />
+                    </div>
+                  </div>
                 </div>
-              </button>
+              </div>
+              <div className="text-xs leading-6 text-[#a9a39a]">
+                北京时间，用于推算八字中的时柱。
+              </div>
             </div>
 
             <div className="space-y-2 md:col-span-1">
@@ -424,77 +814,14 @@ export function BirthInfoForm() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-8 w-full rounded-2xl border border-[#d7c29d]/20 bg-[linear-gradient(135deg,#f1ede5_0%,#d8cab2_100%)] px-5 py-4 text-sm font-semibold text-[#191612] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-8 w-full rounded-2xl border border-[#d7c29d]/20 bg-[linear-gradient(135deg,#f1ede5_0%,#d8cab2_100%)] px-5 py-4 text-sm font-semibold text-[#191612] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50 btn-gradient"
           >
             {loading ? "正在排盘并生成结果..." : "开始测算"}
           </button>
         </div>
       </form>
 
-      <WheelPickerSheet
-        open={activePicker === "date"}
-        title="选择出生年月日"
-        subtitle="滚轮选择已和整体界面统一为深色金属质感；切换公历或农历后，日期范围会自动校正。"
-        columns={[
-          {
-            label: "年份",
-            options: yearOptions,
-            value: dateDraft.year,
-            onChange: (value) =>
-              setDateDraft((prev) => clampDateDraft({ ...prev, year: value }, form.calendarType)),
-          },
-          {
-            label: "月份",
-            options: monthOptions,
-            value: dateDraft.month,
-            onChange: (value) =>
-              setDateDraft((prev) => clampDateDraft({ ...prev, month: value }, form.calendarType)),
-          },
-          {
-            label: "日期",
-            options: dayOptions,
-            value: dateDraft.day,
-            onChange: (value) => setDateDraft((prev) => ({ ...prev, day: value })),
-          },
-        ]}
-        onClose={closePicker}
-        onConfirm={() => {
-          const nextDate = clampDateDraft(dateDraft, form.calendarType);
-          setForm((prev) => ({
-            ...prev,
-            birthDate: formatBirthDate(nextDate),
-          }));
-          closePicker();
-        }}
-      />
 
-      <WheelPickerSheet
-        open={activePicker === "time"}
-        title="选择出生时间"
-        subtitle="请以北京时间为准，滚轮选择更适合精确填写时柱对应时间。"
-        columns={[
-          {
-            label: "小时",
-            options: hourOptions,
-            value: timeDraft.hour,
-            onChange: (value) => setTimeDraft((prev) => ({ ...prev, hour: value })),
-          },
-          {
-            label: "分钟",
-            options: minuteOptions,
-            value: timeDraft.minute,
-            onChange: (value) => setTimeDraft((prev) => ({ ...prev, minute: value })),
-          },
-        ]}
-        onClose={closePicker}
-        onConfirm={() => {
-          setForm((prev) => ({
-            ...prev,
-            birthTime: formatBirthTime(timeDraft),
-          }));
-          closePicker();
-        }}
-      />
 
       <WheelPickerSheet
         open={activePicker === "place"}
