@@ -6,21 +6,66 @@ export function TaijiMark({ className = "" }: TaijiMarkProps) {
   return (
     <svg
       aria-hidden="true"
-      viewBox="0 0 16 16"
+      viewBox="0 0 100 100"
       className={`h-[76px] w-[76px] shrink-0 drop-shadow-[0_18px_36px_rgba(0,0,0,0.35)]${className ? ` ${className}` : ""}`}
     >
-      <circle cx="8" cy="8" r="7.25" fill="#f2eee7" />
+      <defs>
+        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#c7b188" />
+          <stop offset="50%" stopColor="#f4efe7" />
+          <stop offset="100%" stopColor="#c7b188" />
+        </linearGradient>
+        <linearGradient id="darkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1a1a1a" />
+          <stop offset="50%" stopColor="#2d2d2d" />
+          <stop offset="100%" stopColor="#1a1a1a" />
+        </linearGradient>
+      </defs>
+
+      <circle cx="50" cy="50" r="48" fill="url(#darkGradient)" stroke="#c7b188" strokeWidth="1.5" />
+
+      <g fill="none" stroke="#c7b188" strokeWidth="1.2" strokeLinecap="round">
+        <line x1="50" y1="2" x2="50" y2="98" />
+        <line x1="2" y1="50" x2="98" y2="50" />
+        <line x1="15" y1="15" x2="85" y2="85" />
+        <line x1="85" y1="15" x2="15" y2="85" />
+      </g>
+
       <path
-        fill="#0b0b0b"
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M1 8a7 7 0 0 1 7-7 3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 0 0 7 7 7 0 0 1-7-7m7 4.667a1.167 1.167 0 1 1 0-2.334 1.167 1.167 0 0 1 0 2.334"
+        d="M50 2 A48 48 0 0 1 98 50 L50 50 Z"
+        fill="#f4efe7"
       />
       <path
-        fill="#f2eee7"
-        d="M9.167 4.5a1.167 1.167 0 1 1-2.334 0 1.167 1.167 0 0 1 2.334 0"
+        d="M98 50 A48 48 0 0 1 50 98 L50 50 Z"
+        fill="#1a1a1a"
       />
-      <circle cx="8" cy="8" r="7.25" fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="0.28" />
+      <path
+        d="M50 98 A48 48 0 0 1 2 50 L50 50 Z"
+        fill="#1a1a1a"
+      />
+      <path
+        d="M2 50 A48 48 0 0 1 50 2 L50 50 Z"
+        fill="#f4efe7"
+      />
+
+      <circle cx="50" cy="26" r="12" fill="#1a1a1a" />
+      <circle cx="50" cy="26" r="4" fill="#f4efe7" />
+
+      <circle cx="50" cy="74" r="12" fill="#f4efe7" />
+      <circle cx="50" cy="74" r="4" fill="#1a1a1a" />
+
+      <g fill="#c7b188" fontSize="7" fontFamily="serif" textAnchor="middle" dominantBaseline="middle">
+        <text x="50" y="12">乾</text>
+        <text x="88" y="50">兑</text>
+        <text x="50" y="88">坤</text>
+        <text x="12" y="50">艮</text>
+        <text x="78" y="22">巽</text>
+        <text x="78" y="78">离</text>
+        <text x="22" y="78">坎</text>
+        <text x="22" y="22">震</text>
+      </g>
+
+      <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(199,177,136,0.3)" strokeWidth="0.5" />
     </svg>
   );
 }
