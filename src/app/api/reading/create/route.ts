@@ -11,12 +11,29 @@ const requestSchema = z.object({
   birthDate: z.string(),
   birthTime: z.string(),
   birthplace: z.string().optional().default(""),
+  captchaToken: z.string(),
 });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const input = requestSchema.parse(body);
+    
+    const captchaResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/captcha/bagua`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: input.captchaToken,
+        selectedIndex: -1,
+      }),
+    });
+    
+    const captchaResult = await captchaResponse.json();
+    
+    if (!captchaResult.success) {
+      return Response.json({ error: "验证码无效或已过期" }, { status: 400 });
+    }
+    
     const reading = await createReading(input);
     saveReading(reading.sessionId, reading);
 

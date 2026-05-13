@@ -109,30 +109,12 @@ export default function Home() {
         </div>
 
         {/* 底部信息 */}
-        <div className="mt-12 grid gap-4 lg:grid-cols-[minmax(0,1fr)_160px_160px_160px]">
+        <div className="mt-12">
           <div className="mystic-panel mystic-border rounded-[30px] px-6 py-6 text-sm leading-7 text-[#d0cabf]">
             <p>
               测算内容仅用于当前会话展示，不写入云端长期数据库；关闭当前页面后，系统会自动释放本次临时缓存，尽量减少信息停留时间。
             </p>
           </div>
-          <Link
-            href="/privacy"
-            className="flex items-center justify-center rounded-[30px] border border-white/8 bg-white/4 px-5 py-6 text-sm text-[#d3cdc3] transition hover:bg-white/8 hover:text-white btn-glass"
-          >
-            隐私说明
-          </Link>
-          <Link
-            href="/disclaimer"
-            className="flex items-center justify-center rounded-[30px] border border-white/8 bg-white/4 px-5 py-6 text-sm text-[#d3cdc3] transition hover:bg-white/8 hover:text-white btn-glass"
-          >
-            免责声明
-          </Link>
-          <Link
-            href="/terms"
-            className="flex items-center justify-center rounded-[30px] border border-white/8 bg-white/4 px-5 py-6 text-sm text-[#d3cdc3] transition hover:bg-white/8 hover:text-white btn-glass"
-          >
-            服务条款
-          </Link>
         </div>
       </section>
 
@@ -145,7 +127,7 @@ export default function Home() {
               <span className="text-sm text-[#d3cdc3]">© 2026 福星 AI 命理</span>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-xs text-[#d3cdc3] hover:text-[#c7b188] transition-colors">隐私政策</Link>
+              <Link href="/privacy" className="text-xs text-[#d3cdc3] hover:text-[#c7b188] transition-colors">隐私说明</Link>
               <Link href="/disclaimer" className="text-xs text-[#d3cdc3] hover:text-[#c7b188] transition-colors">免责声明</Link>
               <Link href="/terms" className="text-xs text-[#d3cdc3] hover:text-[#c7b188] transition-colors">服务条款</Link>
             </div>

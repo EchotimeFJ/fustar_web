@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { WheelPickerSheet, type WheelOption } from "@/components/forms/wheel-picker-sheet";
+import { BaguaCaptchaModal } from "@/components/ui/bagua-captcha-modal";
 import { REGION_OPTIONS } from "@/lib/region-options";
 
 type PickerType = "date" | "time" | "place" | null;
@@ -136,7 +137,6 @@ function clampDateDraft(date: DraftDate, calendarType: CalendarType): DraftDate 
 export function BirthInfoForm() {
   const router = useRouter();
 
-  // 从本地存储加载表单数据
   const loadFormFromStorage = (): FormState => {
     try {
       const savedForm = localStorage.getItem('fustar_form');
@@ -156,8 +156,8 @@ export function BirthInfoForm() {
   const [dateDraft, setDateDraft] = useState<DraftDate>(() => parseBirthDate(form.birthDate));
   const [timeDraft, setTimeDraft] = useState<DraftTime>(() => parseBirthTime(form.birthTime));
   const [placeDraft, setPlaceDraft] = useState<DraftPlace>(() => inferPlaceDraft(form.birthplace));
+  const [showCaptchaModal, setShowCaptchaModal] = useState(false);
 
-  // 监听表单变化，保存到本地存储
   useEffect(() => {
     try {
       localStorage.setItem('fustar_form', JSON.stringify(form));
@@ -264,8 +264,11 @@ export function BirthInfoForm() {
     setActivePicker(null);
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleStartCalculation() {
+    setShowCaptchaModal(true);
+  }
+
+  async function handleSubmitWithCaptcha(token: string) {
     setLoading(true);
     setError("");
 
@@ -280,6 +283,7 @@ export function BirthInfoForm() {
           birthDate: form.birthDate,
           birthTime: form.birthTime,
           birthplace: form.birthplace,
+          captchaToken: token,
         }),
       });
 
@@ -301,7 +305,6 @@ export function BirthInfoForm() {
   return (
     <>
       <form
-        onSubmit={handleSubmit}
         className="mystic-panel mystic-border relative overflow-hidden w-full rounded-[38px] p-6 md:p-8"
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,rgba(208,183,136,0.16),transparent_62%)]" />
@@ -368,7 +371,7 @@ export function BirthInfoForm() {
             </div>
 
             <div className="space-y-4 md:col-span-2">
-              <span className="text-sm font-medium text-[#e5e0d7]">出生年月日</span>
+              <span className="text-sm font-medium text-[#e5e0d7]">出生日期</span>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">年份</div>
@@ -407,7 +410,6 @@ export function BirthInfoForm() {
                         const handleMouseUp = () => {
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
-                          // 滚动结束后更新值
                           const selectedIndex = Math.max(0, Math.min(yearOptions.length - 1, Math.round(target.scrollTop / 40)));
                           const selectedOption = yearOptions[selectedIndex];
                           if (selectedOption && selectedOption.value !== dateDraft.year) {
@@ -447,10 +449,10 @@ export function BirthInfoForm() {
                           </button>
                         );
                       })}
-                      <div style={{ height: 80 }} />
                     </div>
                   </div>
                 </div>
+
                 <div className="space-y-2">
                   <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">月份</div>
                   <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
@@ -488,7 +490,6 @@ export function BirthInfoForm() {
                         const handleMouseUp = () => {
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
-                          // 滚动结束后更新值
                           const selectedIndex = Math.max(0, Math.min(monthOptions.length - 1, Math.round(target.scrollTop / 40)));
                           const selectedOption = monthOptions[selectedIndex];
                           if (selectedOption && selectedOption.value !== dateDraft.month) {
@@ -528,10 +529,10 @@ export function BirthInfoForm() {
                           </button>
                         );
                       })}
-                      <div style={{ height: 80 }} />
                     </div>
                   </div>
                 </div>
+
                 <div className="space-y-2">
                   <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">日期</div>
                   <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
@@ -549,10 +550,10 @@ export function BirthInfoForm() {
                         const selectedIndex = Math.max(0, Math.min(dayOptions.length - 1, Math.round(target.scrollTop / 40)));
                         const selectedOption = dayOptions[selectedIndex];
                         if (selectedOption && selectedOption.value !== dateDraft.day) {
-                          setDateDraft(prev => ({ ...prev, day: selectedOption.value }));
+                          setDateDraft(prev => clampDateDraft({ ...prev, day: selectedOption.value }, form.calendarType));
                           setForm(prev => ({
                             ...prev,
-                            birthDate: formatBirthDate({ ...parseBirthDate(prev.birthDate), day: selectedOption.value })
+                            birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), day: selectedOption.value }, form.calendarType))
                           }));
                         }
                       }}
@@ -569,14 +570,13 @@ export function BirthInfoForm() {
                         const handleMouseUp = () => {
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
-                          // 滚动结束后更新值
                           const selectedIndex = Math.max(0, Math.min(dayOptions.length - 1, Math.round(target.scrollTop / 40)));
                           const selectedOption = dayOptions[selectedIndex];
                           if (selectedOption && selectedOption.value !== dateDraft.day) {
-                            setDateDraft(prev => ({ ...prev, day: selectedOption.value }));
+                            setDateDraft(prev => clampDateDraft({ ...prev, day: selectedOption.value }, form.calendarType));
                             setForm(prev => ({
                               ...prev,
-                              birthDate: formatBirthDate({ ...parseBirthDate(prev.birthDate), day: selectedOption.value })
+                              birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), day: selectedOption.value }, form.calendarType))
                             }));
                           }
                         };
@@ -593,10 +593,10 @@ export function BirthInfoForm() {
                             key={option.value}
                             type="button"
                             onClick={() => {
-                              setDateDraft(prev => ({ ...prev, day: option.value }));
+                              setDateDraft(prev => clampDateDraft({ ...prev, day: option.value }, form.calendarType));
                               setForm(prev => ({
                                 ...prev,
-                                birthDate: formatBirthDate({ ...parseBirthDate(prev.birthDate), day: option.value })
+                                birthDate: formatBirthDate(clampDateDraft({ ...parseBirthDate(prev.birthDate), day: option.value }, form.calendarType))
                               }));
                             }}
                             style={{ height: 40 }}
@@ -608,16 +608,15 @@ export function BirthInfoForm() {
                           </button>
                         );
                       })}
-                      <div style={{ height: 80 }} />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4 md:col-span-1">
-              <span className="text-sm font-medium text-[#e5e0d7]">出生时间</span>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2 md:col-span-1">
+              <span className="text-sm font-medium text-[#e5e0d7]">出生时辰</span>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">小时</div>
                   <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
@@ -655,7 +654,6 @@ export function BirthInfoForm() {
                         const handleMouseUp = () => {
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
-                          // 滚动结束后更新值
                           const selectedIndex = Math.max(0, Math.min(hourOptions.length - 1, Math.round(target.scrollTop / 40)));
                           const selectedOption = hourOptions[selectedIndex];
                           if (selectedOption && selectedOption.value !== timeDraft.hour) {
@@ -694,10 +692,10 @@ export function BirthInfoForm() {
                           </button>
                         );
                       })}
-                      <div style={{ height: 80 }} />
                     </div>
                   </div>
                 </div>
+
                 <div className="space-y-2">
                   <div className="text-[11px] font-semibold tracking-[0.28em] text-[#b79d72] uppercase text-center">分钟</div>
                   <div className="relative overflow-hidden rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
@@ -735,7 +733,6 @@ export function BirthInfoForm() {
                         const handleMouseUp = () => {
                           document.removeEventListener('mousemove', handleMouseMove);
                           document.removeEventListener('mouseup', handleMouseUp);
-                          // 滚动结束后更新值
                           const selectedIndex = Math.max(0, Math.min(minuteOptions.length - 1, Math.round(target.scrollTop / 40)));
                           const selectedOption = minuteOptions[selectedIndex];
                           if (selectedOption && selectedOption.value !== timeDraft.minute) {
@@ -774,7 +771,6 @@ export function BirthInfoForm() {
                           </button>
                         );
                       })}
-                      <div style={{ height: 80 }} />
                     </div>
                   </div>
                 </div>
@@ -811,7 +807,8 @@ export function BirthInfoForm() {
           ) : null}
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleStartCalculation}
             disabled={loading}
             className="mt-8 w-full rounded-2xl border border-[#d7c29d]/20 bg-[linear-gradient(135deg,#f1ede5_0%,#d8cab2_100%)] px-5 py-4 text-sm font-semibold text-[#191612] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50 btn-gradient"
           >
@@ -820,12 +817,16 @@ export function BirthInfoForm() {
         </div>
       </form>
 
-
+      <BaguaCaptchaModal
+        isOpen={showCaptchaModal}
+        onClose={() => setShowCaptchaModal(false)}
+        onVerified={handleSubmitWithCaptcha}
+      />
 
       <WheelPickerSheet
         open={activePicker === "place"}
         title="选择出生地区"
-        subtitle="覆盖全国省级、地级市、自治州、地区、直辖市区县，以及港澳与台湾县市；如果你不想填写，也可以直接保留“暂不填写”。"
+        subtitle={"覆盖全国省级、地级市、自治州、地区、直辖市区县，以及港澳与台湾县市；如果你不想填写，也可以直接保留\u201C暂不填写\u201D。"}
         columns={[
           {
             label: "省份",
